@@ -9,7 +9,7 @@ export const wonderData = {
       { id: "wonder", num: "01", icon: "🔍", name: "Wonder", desc: "Curiosity puzzle before learning" },
       { id: "story", num: "02", icon: "📖", name: "Story", desc: "Oliver's Bakery Adventure story" },
       { id: "simulate", num: "03", icon: "🧪", name: "Simulate", desc: "Slice, shade, compare & spot errors" },
-      { id: "play", num: "04", icon: "🎮", name: "Play", desc: "10 game worlds & 100 questions" },
+      { id: "play", num: "04", icon: "🎮", name: "Practice", desc: "10 game worlds & 100 questions" },
       { id: "reflect", num: "05", icon: "📋", name: "Reflect", desc: "Mastery report & Certificate" }
     ],
     quickTiles: [

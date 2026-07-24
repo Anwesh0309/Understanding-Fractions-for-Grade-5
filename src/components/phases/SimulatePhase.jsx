@@ -96,7 +96,7 @@ export function SimulatePhase({ onComplete }) {
                 onClick={onComplete}
                 className="btn-sim-complete-gold"
               >
-                Continue to Play Phase 🎮 <ArrowRight className="w-4 h-4 ml-1" />
+                Continue to Practice Phase 🎮 <ArrowRight className="w-4 h-4 ml-1" />
               </button>
             )}
           </div>

@@ -5,7 +5,7 @@ const PHASES = [
   { id: 'wonder', num: '01', icon: '🔍', label: 'Wonder' },
   { id: 'story', num: '02', icon: '📖', label: 'Story' },
   { id: 'simulate', num: '03', icon: '🧪', label: 'Simulate' },
-  { id: 'play', num: '04', icon: '🎮', label: 'Play' },
+  { id: 'play', num: '04', icon: '🎮', label: 'Practice' },
   { id: 'reflect', num: '05', icon: '📋', label: 'Reflect' },
 ];
 

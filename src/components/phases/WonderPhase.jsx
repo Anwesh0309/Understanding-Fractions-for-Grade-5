@@ -109,7 +109,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
                 <div className="journey-flow-item">
                   <div className="item-icon-bg">🎮</div>
                   <div className="item-labels">
-                    <span className="item-title">Play</span>
+                    <span className="item-title">Practice</span>
                     <span className="item-desc">100 challenges</span>
                   </div>
                 </div>
