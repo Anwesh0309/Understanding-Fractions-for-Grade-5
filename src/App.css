@@ -81,9 +81,9 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(16, 9, 38, 0.7);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--card-border);
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
   z-index: 20;
   flex-shrink: 0;
 }
