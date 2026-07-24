@@ -269,6 +269,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   };
 
   const handleAdvanceAfterPopup = () => {
+    stopNarration();
     if (lives <= 0) {
       // Out of hearts popup
       onUpdateProgress({
@@ -289,10 +290,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
         passed,
         unlockedNext: passed
       });
-      speakText("World Complete! Switching to World List...");
-      setTimeout(() => {
-        onBackToWorlds();
-      }, 1200);
+      onBackToWorlds();
     } else {
       setQIdx(prev => prev + 1);
     }

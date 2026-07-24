@@ -1,6 +1,7 @@
 /**
  * Audio Engine for FractionVerse 360
  * Integrates ElevenLabs TTS with Web Speech API fallback.
+ * Guarantees ZERO audio overlap using activeSpeechId tokens.
  */
 
 const ELEVEN_LABS_VOICE_ID = import.meta.env.VITE_ELEVENLABS_VOICE_ID || "Xb7hH8MSUJpSbSDYk0k2";
@@ -9,6 +10,7 @@ const ELEVEN_LABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY || "sk_45ca4
 let isMuted = false;
 let currentAudio = null;
 let currentUtterance = null;
+let activeSpeechId = 0;
 const audioCache = new Map();
 
 export function toggleMute(mutedState) {
@@ -24,13 +26,19 @@ export function getMuteState() {
 }
 
 export function stopNarration() {
+  activeSpeechId++; // Invalidate all pending async audio fetches!
   if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio.src = "";
+    } catch (e) {}
     currentAudio = null;
   }
   if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
   }
   currentUtterance = null;
 }
@@ -39,16 +47,27 @@ export async function speakText(text, options = {}) {
   if (isMuted || !text) return;
 
   stopNarration();
+  const thisSpeechId = activeSpeechId;
 
-  // Clean text for speech (convert fraction slash notation to verbal if appropriate)
-  const spokenText = text.replace(/(\d+)\/(\d+)/g, "$1 over $2");
+  // Pronunciation formatting for fraction slash notation
+  const spokenText = text
+    .replace(/1\/2/g, "one half")
+    .replace(/1\/3/g, "one third")
+    .replace(/2\/3/g, "two thirds")
+    .replace(/1\/4/g, "one quarter")
+    .replace(/3\/4/g, "three quarters")
+    .replace(/1\/5/g, "one fifth")
+    .replace(/2\/5/g, "two fifths")
+    .replace(/(\d+)\/(\d+)/g, "$1 over $2");
 
   // Try ElevenLabs API if key is present
   if (ELEVEN_LABS_API_KEY && ELEVEN_LABS_API_KEY.startsWith("sk_")) {
     try {
       if (audioCache.has(spokenText)) {
         const cachedUrl = audioCache.get(spokenText);
-        playAudioUrl(cachedUrl, options);
+        if (thisSpeechId === activeSpeechId) {
+          playAudioUrl(cachedUrl, thisSpeechId, options);
+        }
         return;
       }
 
@@ -62,7 +81,7 @@ export async function speakText(text, options = {}) {
           text: spokenText,
           model_id: "eleven_multilingual_v2",
           voice_settings: {
-            stability: 0.35,
+            stability: 0.45,
             similarity_boost: 0.75,
             style: 0.45,
             use_speaker_boost: true
@@ -70,11 +89,16 @@ export async function speakText(text, options = {}) {
         }),
       });
 
+      // Abort if another narration started while fetching
+      if (thisSpeechId !== activeSpeechId) return;
+
       if (response.ok) {
         const blob = await response.blob();
+        if (thisSpeechId !== activeSpeechId) return;
+
         const audioUrl = URL.createObjectURL(blob);
         audioCache.set(spokenText, audioUrl);
-        playAudioUrl(audioUrl, options);
+        playAudioUrl(audioUrl, thisSpeechId, options);
         return;
       }
     } catch (err) {
@@ -83,34 +107,46 @@ export async function speakText(text, options = {}) {
   }
 
   // Fallback to Web Speech API
-  speakWebSpeech(spokenText, options);
+  if (thisSpeechId === activeSpeechId) {
+    speakWebSpeech(spokenText, thisSpeechId, options);
+  }
 }
 
-function playAudioUrl(url, options = {}) {
+function playAudioUrl(url, speechId, options = {}) {
+  if (speechId !== activeSpeechId) return;
+
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio.src = "";
+    } catch (e) {}
+    currentAudio = null;
+  }
+
   const audio = new Audio(url);
   currentAudio = audio;
-  if (options.onStart) options.onStart();
+
   audio.onended = () => {
-    currentAudio = null;
+    if (currentAudio === audio) currentAudio = null;
     if (options.onEnd) options.onEnd();
   };
+
   audio.onerror = () => {
-    currentAudio = null;
-    speakWebSpeech(options.rawText || "", options);
+    if (currentAudio === audio) currentAudio = null;
   };
+
   audio.play().catch(e => {
     console.warn("Audio play blocked or failed:", e);
-    if (options.onEnd) options.onEnd();
   });
 }
 
-function speakWebSpeech(text, options = {}) {
-  if (!window.speechSynthesis || isMuted) return;
+function speakWebSpeech(text, speechId, options = {}) {
+  if (!window.speechSynthesis || isMuted || speechId !== activeSpeechId) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 0.95;
   utterance.pitch = 1.05;
-  
-  // Select a friendly English voice if available
+
   const voices = window.speechSynthesis.getVoices();
   const femaleVoice = voices.find(v => v.lang.startsWith("en") && (v.name.includes("Alice") || v.name.includes("Google") || v.name.includes("Samantha") || v.name.includes("Zira")));
   if (femaleVoice) utterance.voice = femaleVoice;
