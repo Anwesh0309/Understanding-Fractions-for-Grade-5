@@ -27,8 +27,10 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
         <div className="hero-ss-container">
           {/* Top Pill Badge */}
           <div className="hero-top-badge-pill">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 inline mr-1.5" />
-            Grade 5 · Fractions Adventure
+            <span className="badge-sparkle-yellow">✨</span>{' '}
+            <span className="badge-grade-light-yellow">Grade 5</span>{' '}
+            <span className="badge-dot-white">·</span>{' '}
+            <span className="badge-adventure-white">Fractions Adventure</span>
           </div>
 
           {/* Main Title: Division as Grouping -> Understanding as Fractions */}
