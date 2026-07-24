@@ -4,7 +4,7 @@
  */
 
 const ELEVEN_LABS_VOICE_ID = import.meta.env.VITE_ELEVENLABS_VOICE_ID || "Xb7hH8MSUJpSbSDYk0k2";
-const ELEVEN_LABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY || "sk_13c95dcde53c821510f9db98accf79e28754c524ab306a3d";
+const ELEVEN_LABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY || "sk_45ca46876d7388b8f9039bd913169d0a677d388ca2606ec2";
 
 let isMuted = false;
 let currentAudio = null;
