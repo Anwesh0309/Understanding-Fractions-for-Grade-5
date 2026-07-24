@@ -2710,12 +2710,13 @@ body, html {
 
 .play-main-card-ss {
   width: 100%;
-  background: rgba(22, 14, 48, 0.85);
+  max-width: 640px;
+  background: rgba(22, 14, 48, 0.88);
   border: 1.5px solid rgba(255, 255, 255, 0.16);
-  border-radius: 28px;
-  padding: 24px 32px;
+  border-radius: 24px;
+  padding: 16px 20px;
   backdrop-filter: blur(16px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2726,46 +2727,46 @@ body, html {
   background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);
   border: 1.5px solid #ffffff;
   border-radius: 50px;
-  padding: 5px 20px;
+  padding: 4px 16px;
   font-family: 'Fredoka', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 1px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 14px rgba(255, 87, 34, 0.4);
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
 }
 
 .play-stem-title-ss {
   font-family: 'Fredoka', sans-serif;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.35;
-  margin-bottom: 20px;
+  line-height: 1.3;
+  margin-bottom: 12px;
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .play-tiles-2x2-ss {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 10px;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .play-tile-btn-ss {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1.5px solid rgba(255, 255, 255, 0.16);
-  border-radius: 18px;
-  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 12px 14px;
   font-family: 'Fredoka', sans-serif;
   font-weight: 900;
-  font-size: 19px;
+  font-size: 17px;
   color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .play-tile-btn-ss:hover:not(:disabled) {

@@ -14,6 +14,8 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
   useEffect(() => {
     if (showPuzzle) {
       speakText(wonderData.puzzleCard.narration);
+    } else {
+      speakText("Welcome to Grade 5 Fractions Adventure! Ready to slice into fractions with Figgy?");
     }
   }, [showPuzzle]);
 
