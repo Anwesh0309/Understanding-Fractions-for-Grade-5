@@ -2,6 +2,7 @@
  * Audio Engine for FractionVerse 360
  * Integrates ElevenLabs TTS with Web Speech API fallback.
  * Guarantees ZERO audio overlap using activeSpeechId tokens.
+ * Unlocks Web Speech API audio context on first user interaction.
  */
 
 const ELEVEN_LABS_VOICE_ID = import.meta.env.VITE_ELEVENLABS_VOICE_ID || "Xb7hH8MSUJpSbSDYk0k2";
@@ -11,7 +12,27 @@ let isMuted = false;
 let currentAudio = null;
 let currentUtterance = null;
 let activeSpeechId = 0;
+let audioUnlocked = false;
 const audioCache = new Map();
+
+// Unlock browser speech audio context on first click/touch
+function unlockAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  if (window.speechSynthesis) {
+    try {
+      const dummy = new SpeechSynthesisUtterance("");
+      dummy.volume = 0;
+      window.speechSynthesis.speak(dummy);
+    } catch(e) {}
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('click', unlockAudio, { once: true });
+  window.addEventListener('touchstart', unlockAudio, { once: true });
+  window.addEventListener('keydown', unlockAudio, { once: true });
+}
 
 export function toggleMute(mutedState) {
   isMuted = mutedState !== undefined ? mutedState : !isMuted;
@@ -44,6 +65,7 @@ export function stopNarration() {
 }
 
 export async function speakText(text, options = {}) {
+  unlockAudio();
   if (isMuted || !text) return;
 
   stopNarration();

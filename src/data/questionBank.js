@@ -1280,6 +1280,34 @@ export const rawQuestionBank = [
   }
 ];
 
+function buildFourOptions(correctAnswer, distractors = [], seed = 1) {
+  const cleanCorrect = String(correctAnswer !== undefined && correctAnswer !== null ? correctAnswer : "1/2").trim();
+  const cleanSet = new Set([cleanCorrect]);
+
+  (distractors || []).forEach(d => {
+    if (d !== undefined && d !== null) {
+      const str = String(d).trim();
+      if (str.length > 0) {
+        cleanSet.add(str);
+      }
+    }
+  });
+
+  let fillCount = 1;
+  while (cleanSet.size < 4) {
+    const f1 = `${fillCount}/${fillCount + 2}`;
+    const f2 = `${fillCount + 1}/${fillCount + 3}`;
+    const f3 = `${fillCount + 2}/${fillCount + 4}`;
+    if (!cleanSet.has(f1)) cleanSet.add(f1);
+    else if (!cleanSet.has(f2)) cleanSet.add(f2);
+    else cleanSet.add(f3);
+    fillCount++;
+  }
+
+  const rawArray = Array.from(cleanSet).slice(0, 4);
+  return shuffle(rawArray, seed);
+}
+
 function getUniqueFallbackQuestion(worldId, qNum) {
   const mult = qNum;
   if (worldId === "pizza-piazza") {
@@ -1293,7 +1321,7 @@ function getUniqueFallbackQuestion(worldId, qNum) {
       conceptTitle: `SIMPLIFY ${num}/${den}`,
       stemText: `Question ${qNum}: Express the fraction ${num}/${den} in its simplest form.`,
       correctAnswer: ans,
-      options: shuffle([ans, `${num - 1}/${den}`, `${num}/${den - 1}`, `${num + 1}/${den}`], qNum * 41),
+      options: buildFourOptions(ans, [`${num - 1}/${den}`, `${num}/${den - 1}`, `${num + 1}/${den}`], qNum * 41),
       narrationText: `Question ${qNum}: Express the fraction ${num}/${den} in its simplest form.`
     };
   } else if (worldId === "ribbon-row") {
@@ -1306,7 +1334,7 @@ function getUniqueFallbackQuestion(worldId, qNum) {
       conceptTitle: `COMPARE FRACTIONS #${qNum}`,
       stemText: `Question ${qNum}: Which fraction is larger: ${n1}/${d1} or ${n2}/${d2}?`,
       correctAnswer: `${n1}/${d1}`,
-      options: shuffle([`${n1}/${d1}`, `${n2}/${d2}`, "They are equal", `${n1 + 1}/${d1}`], qNum * 41),
+      options: buildFourOptions(`${n1}/${d1}`, [`${n2}/${d2}`, "They are equal", `${n1 + 1}/${d1}`], qNum * 41),
       narrationText: `Question ${qNum}: Which fraction is larger: ${n1} over ${d1} or ${n2} over ${d2}?`
     };
   } else if (worldId === "bakery-blend") {
@@ -1319,7 +1347,7 @@ function getUniqueFallbackQuestion(worldId, qNum) {
       conceptTitle: `ADD LIKE FRACTIONS #${qNum}`,
       stemText: `Question ${qNum}: Add the fractions ${n1}/${den} + ${n2}/${den}.`,
       correctAnswer: `${sum}/${den}`,
-      options: shuffle([`${sum}/${den}`, `${sum - 1}/${den}`, `${sum + 1}/${den}`, `${sum}/${den * 2}`], qNum * 41),
+      options: buildFourOptions(`${sum}/${den}`, [`${sum - 1}/${den}`, `${sum + 1}/${den}`, `${sum}/${den * 2}`], qNum * 41),
       narrationText: `Question ${qNum}: Add the fractions ${n1}/${den} plus ${n2}/${den}.`
     };
   } else {
@@ -1332,7 +1360,7 @@ function getUniqueFallbackQuestion(worldId, qNum) {
       conceptTitle: `FRACTION PRACTICE #${qNum}`,
       stemText: `Question ${qNum}: Solve: What is ${val1}/10 + ${val2}/10?`,
       correctAnswer: `${val1 + val2}/10`,
-      options: shuffle([`${val1 + val2}/10`, `${val1 + val2 - 1}/10`, `${val1 + val2 + 1}/10`, `${val1}/10`], qNum * 41),
+      options: buildFourOptions(`${val1 + val2}/10`, [`${val1 + val2 - 1}/10`, `${val1 + val2 + 1}/10`, `${val1}/10`], qNum * 41),
       narrationText: `Question ${qNum}: Solve: What is ${val1}/10 plus ${val2}/10?`
     };
   }
@@ -1382,7 +1410,7 @@ export function getRoundQuestions(worldId, count = 10) {
 
       if (!seenStems.has(stemText)) {
         seenStems.add(stemText);
-        const options = shuffle([correctAnswer, ...distractors], seed + 99);
+        const options = buildFourOptions(correctAnswer, distractors, seed + 99);
 
         resultQuestions.push({
           id: `${template.id || 'q'}-${resultQuestions.length + 1}`,
@@ -1407,7 +1435,7 @@ export function getRoundQuestions(worldId, count = 10) {
       } else {
         fallbackQ.stemText = `Challenge Question ${qNum}: Express ${qNum * 2}/${qNum * 3} in simplest form.`;
         fallbackQ.correctAnswer = "2/3";
-        fallbackQ.options = shuffle(["2/3", "3/4", "1/2", "4/5"], qNum * 17);
+        fallbackQ.options = buildFourOptions("2/3", ["3/4", "1/2", "4/5"], qNum * 17);
         resultQuestions.push(fallbackQ);
       }
     }

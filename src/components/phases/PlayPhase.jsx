@@ -399,7 +399,8 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
                   onClick={() => handleSelectAnswer(opt)}
                   className={tileClass}
                 >
-                  {opt}
+                  <span className="text-amber-300 font-bold mr-2 inline-block">{String.fromCharCode(65 + i)}.</span>
+                  <span>{opt}</span>
                 </button>
               );
             })}
