@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { simulateStations, spotTheSlipProblems } from '../../data/simulateContent';
 import { MascotBubble } from '../shell/MascotBubble';
 import { speakText } from '../../utils/audio';
-import { addFractions, simplify } from '../../utils/fractionMath';
-import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle, XCircle, Sparkles } from 'lucide-react';
+import { addFractions } from '../../utils/fractionMath';
+import { ArrowLeft, ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
 
 export function SimulatePhase({ onComplete }) {
   const [activeTab, setActiveTab] = useState("slice-it");
@@ -26,7 +26,7 @@ export function SimulatePhase({ onComplete }) {
       <div className="simulate-container-card">
         {/* Top Horizontal Station Tabs A / B / C / D */}
         <div className="simulate-tabs-bar">
-          {simulateStations.map((st, idx) => (
+          {simulateStations.map((st) => (
             <button
               key={st.id}
               onClick={() => setActiveTab(st.id)}
@@ -93,33 +93,22 @@ export function SimulatePhase({ onComplete }) {
         </div>
       </div>
 
-      {/* REQUIREMENT 5: Correct & Wrong Feedback Popup Modal */}
+      {/* EXACT MATCH SCREENSHOT FEEDBACK POPUP MODAL */}
       {feedbackPopup && (
-        <div className="feedback-modal-backdrop" onClick={closeFeedback}>
+        <div className="feedback-modal-backdrop-ss" onClick={closeFeedback}>
           <div
-            className={`feedback-modal-card ${feedbackPopup.type === 'correct' ? 'success' : 'error'}`}
+            className={`feedback-modal-card-ss ${feedbackPopup.type === 'correct' ? 'card-success-green' : 'card-error-red'}`}
             onClick={e => e.stopPropagation()}
           >
-            <div className="feedback-modal-icon">
-              {feedbackPopup.type === 'correct' ? (
-                <CheckCircle className="w-16 h-16 text-emerald-400 animate-bounce" />
-              ) : (
-                <XCircle className="w-16 h-16 text-rose-400 animate-shake" />
-              )}
+            <div className="modal-emoji-top">
+              {feedbackPopup.type === 'correct' ? '🎉' : '🥺'}
             </div>
 
-            <h3 className="feedback-modal-title">
-              {feedbackPopup.type === 'correct' ? '🎉 Great Job!' : '⚠️ Try Again!'}
+            <h3 className="modal-title-ss">
+              {feedbackPopup.type === 'correct' ? 'Correct! 🎉' : 'Not quite!'}
             </h3>
 
-            <p className="feedback-modal-message">{feedbackPopup.message}</p>
-
-            <button
-              onClick={closeFeedback}
-              className={`feedback-modal-btn ${feedbackPopup.type === 'correct' ? 'btn-success' : 'btn-error'}`}
-            >
-              {feedbackPopup.type === 'correct' ? 'Awesome! Keep Exploring' : 'Got It, Let Me Fix It'}
-            </button>
+            <p className="modal-message-ss">{feedbackPopup.message}</p>
           </div>
         </div>
       )}
@@ -143,7 +132,6 @@ function StationSliceIt({ setFeedbackPopup }) {
   };
 
   const handleTestAnswer = () => {
-    const fractionVal = shadedParts / parts;
     if (shadedParts > 0) {
       setFeedbackPopup({
         type: 'correct',
@@ -228,8 +216,8 @@ function StationSliceIt({ setFeedbackPopup }) {
    STATION B: MATCH IT
    ========================================== */
 function StationMatchIt({ setFeedbackPopup }) {
-  const [shadedA, setShadedA] = useState(2); // out of 4 (2/4 = 1/2)
-  const [shadedB, setShadedB] = useState(3); // out of 8 (3/8)
+  const [shadedA, setShadedA] = useState(2);
+  const [shadedB, setShadedB] = useState(3);
 
   const isEquivalent = (shadedA / 4) === (shadedB / 8);
 
@@ -243,9 +231,9 @@ function StationMatchIt({ setFeedbackPopup }) {
     } else {
       setFeedbackPopup({
         type: 'wrong',
-        message: `${shadedA}/4 is NOT equal to ${shadedB}/8. Try adjusting Bar B so it shades the same total length as Bar A!`
+        message: `${shadedA}/4 is NOT equal to ${shadedB}/8. Adjust Bar B so it shades the same total length as Bar A!`
       });
-      speakText(`${shadedA}/4 is not equal to ${shadedB}/8. Adjust Bar B.`);
+      speakText(`${shadedA}/4 is not equal to ${shadedB}/8.`);
     }
   };
 
@@ -307,7 +295,7 @@ function StationMatchIt({ setFeedbackPopup }) {
 }
 
 /* ==========================================
-   STATION C: FRACTION SLIDER
+   STATION C: FRACTION SLIDER (SUPER ATTRACTIVE FOR GRADE 5)
    ========================================== */
 function StationFractionSlider({ setFeedbackPopup }) {
   const [numA, setNumA] = useState(1);
@@ -320,20 +308,36 @@ function StationFractionSlider({ setFeedbackPopup }) {
   const handleVerifyAddition = () => {
     setFeedbackPopup({
       type: 'correct',
-      message: `Worked solution verified! ${numA}/${denA} + ${numB}/${denB} converts to ${result.num1}/${result.commonDen} + ${result.num2}/${result.commonDen} = ${result.simplifiedNum}/${result.simplifiedDen}!`
+      message: `${numA}/${denA} + ${numB}/${denB} = ${result.num1}/${result.commonDen} + ${result.num2}/${result.commonDen} = ${result.simplifiedNum}/${result.simplifiedDen}!`
     });
     speakText(`Calculated sum is ${result.simplifiedNum} over ${result.simplifiedDen}`);
   };
 
   return (
     <div className="station-content-layout">
-      {/* Controls */}
-      <div className="station-controls-side">
-        <div className="slider-group">
-          <label className="control-label">Fraction A: {numA} / {denA}</label>
-          <div className="flex gap-2">
-            <input type="range" min="1" max={denA - 1} value={numA} onChange={e => setNumA(parseInt(e.target.value))} />
-            <select value={denA} onChange={e => { setDenA(parseInt(e.target.value)); setNumA(1); }} className="select-den">
+      {/* Controls & Interactive Fraction Bars Side */}
+      <div className="station-controls-side space-y-4">
+        {/* Fraction A Interactive Slider Card */}
+        <div className="fraction-slider-card blue-theme">
+          <div className="slider-card-header">
+            <span className="label-badge-blue">Fraction A 🔷</span>
+            <span className="fraction-value-tag">{numA} / {denA}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min="1"
+              max={denA - 1}
+              value={numA}
+              onChange={e => setNumA(parseInt(e.target.value))}
+              className="slider-input-blue"
+            />
+            <select
+              value={denA}
+              onChange={e => { setDenA(parseInt(e.target.value)); setNumA(1); }}
+              className="select-den-custom"
+            >
               <option value="2">/2</option>
               <option value="3">/3</option>
               <option value="4">/4</option>
@@ -342,13 +346,41 @@ function StationFractionSlider({ setFeedbackPopup }) {
               <option value="12">/12</option>
             </select>
           </div>
+
+          {/* Visual Fraction Bar A */}
+          <div className="visual-fraction-bar-row">
+            {Array.from({ length: denA }).map((_, i) => (
+              <div
+                key={i}
+                className={`fraction-bar-cell ${i < numA ? 'cell-shaded-blue' : ''}`}
+              >
+                1/{denA}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="slider-group mt-3">
-          <label className="control-label">Fraction B: {numB} / {denB}</label>
-          <div className="flex gap-2">
-            <input type="range" min="1" max={denB - 1} value={numB} onChange={e => setNumB(parseInt(e.target.value))} />
-            <select value={denB} onChange={e => { setDenB(parseInt(e.target.value)); setNumB(1); }} className="select-den">
+        {/* Fraction B Interactive Slider Card */}
+        <div className="fraction-slider-card pink-theme">
+          <div className="slider-card-header">
+            <span className="label-badge-pink">Fraction B 🌸</span>
+            <span className="fraction-value-tag">{numB} / {denB}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min="1"
+              max={denB - 1}
+              value={numB}
+              onChange={e => setNumB(parseInt(e.target.value))}
+              className="slider-input-pink"
+            />
+            <select
+              value={denB}
+              onChange={e => { setDenB(parseInt(e.target.value)); setNumB(1); }}
+              className="select-den-custom"
+            >
               <option value="2">/2</option>
               <option value="3">/3</option>
               <option value="4">/4</option>
@@ -357,29 +389,77 @@ function StationFractionSlider({ setFeedbackPopup }) {
               <option value="12">/12</option>
             </select>
           </div>
+
+          {/* Visual Fraction Bar B */}
+          <div className="visual-fraction-bar-row">
+            {Array.from({ length: denB }).map((_, i) => (
+              <div
+                key={i}
+                className={`fraction-bar-cell ${i < numB ? 'cell-shaded-pink' : ''}`}
+              >
+                1/{denB}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <button onClick={handleVerifyAddition} className="btn-action-test mt-4">
-          ✨ Verify Addition Step
+        <button onClick={handleVerifyAddition} className="btn-action-test mt-2">
+          ✨ Calculate & Verify Addition
         </button>
       </div>
 
-      {/* Worked Math Solution Box */}
+      {/* Live Math Worked Solution Box */}
       <div className="station-display-side">
-        <div className="worked-solution-card">
-          <h4 className="worked-title">Live Worked Solution</h4>
-          <p className="worked-step">
-            1. Denominators differ ({denA} & {denB}) ➔ Common LCD = <span className="text-amber-300 font-bold">{result.commonDen}</span>
-          </p>
-          <p className="worked-step">
-            2. Convert: {numA}/{denA} = <span className="text-pink-400 font-bold">{result.num1}/{result.commonDen}</span>, and {numB}/{denB} = <span className="text-pink-400 font-bold">{result.num2}/{result.commonDen}</span>
-          </p>
-          <p className="worked-step">
-            3. Add numerators: {result.num1}/{result.commonDen} + {result.num2}/{result.commonDen} = <span className="text-emerald-400 font-bold">{result.rawNum}/{result.commonDen}</span>
-          </p>
-          <div className="worked-final-pill">
-            Final Sum: <span className="text-amber-300 text-xl font-extrabold ml-2">{result.simplifiedNum}/{result.simplifiedDen}</span>
-            {result.mixed.whole > 0 && <span className="ml-2 text-white">({result.mixed.whole} {result.mixed.num}/{result.mixed.den})</span>}
+        <div className="worked-solution-card-attractive">
+          <div className="worked-header-pill">
+            <Sparkles className="w-4 h-4 text-amber-300 inline mr-1.5" />
+            Live Fractional Addition Visualizer
+          </div>
+
+          <div className="math-equation-display-hero">
+            <span className="eq-part text-cyan-300">{numA}/{denA}</span>
+            <span className="eq-op">+</span>
+            <span className="eq-part text-pink-300">{numB}/{denB}</span>
+            <span className="eq-op">=</span>
+            <span className="eq-result text-amber-300">{result.simplifiedNum}/{result.simplifiedDen}</span>
+          </div>
+
+          <div className="worked-steps-list space-y-2 text-left w-full mt-3">
+            <div className="step-badge-row">
+              <span className="step-num">Step 1:</span> Find Common Denominator (LCD) = <strong>{result.commonDen}</strong>
+            </div>
+
+            <div className="step-badge-row">
+              <span className="step-num">Step 2:</span> Convert Fractions ➔
+              <span className="text-cyan-300 font-bold ml-1">{result.num1}/{result.commonDen}</span> +
+              <span className="text-pink-300 font-bold ml-1">{result.num2}/{result.commonDen}</span>
+            </div>
+
+            {/* Combined Common Parts Visual Bar */}
+            <div className="combined-lcd-visual-box mt-3">
+              <div className="text-xs font-bold text-gray-300 mb-1 text-center">
+                Combined Grid ({result.commonDen} equal parts):
+              </div>
+              <div className="combined-grid-bar">
+                {Array.from({ length: result.commonDen }).map((_, i) => {
+                  const isA = i < result.num1;
+                  const isB = i >= result.num1 && i < result.num1 + result.num2;
+                  return (
+                    <div
+                      key={i}
+                      className={`grid-cell-mini ${isA ? 'fill-blue' : isB ? 'fill-pink' : ''}`}
+                    >
+                      1/{result.commonDen}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="step-badge-row final-result-highlight">
+              <span className="step-num">Result:</span> Total = <strong>{result.rawNum}/{result.commonDen}</strong> = <span className="text-amber-300 font-extrabold text-lg">{result.simplifiedNum}/{result.simplifiedDen}</span>
+              {result.mixed.whole > 0 && <span className="ml-2 text-emerald-300">({result.mixed.whole} {result.mixed.num}/{result.mixed.den})</span>}
+            </div>
           </div>
         </div>
       </div>

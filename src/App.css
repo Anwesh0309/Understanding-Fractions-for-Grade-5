@@ -2208,4 +2208,273 @@ body, html {
   box-shadow: 0 0 8px rgba(255, 193, 7, 0.6);
 }
 
+/* ==========================================================================
+   EXACT MATCH FEEDBACK POPUP MODALS (Green & Red Solid Cards)
+   ========================================================================== */
+.feedback-modal-backdrop-ss {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 5, 25, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.feedback-modal-card-ss {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 28px;
+  padding: 32px 28px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popScale 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popScale {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.feedback-modal-card-ss.card-success-green {
+  background: #38A169; /* Solid rich vibrant green matching SS */
+}
+
+.feedback-modal-card-ss.card-error-red {
+  background: #E53E3E; /* Solid rich vibrant red matching SS */
+}
+
+.modal-emoji-top {
+  font-size: 56px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.modal-title-ss {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.modal-message-ss {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+}
+
+/* ==========================================================================
+   STATION C: FRACTION SLIDER (ATTRACTIVE GRADE 5 STYLING)
+   ========================================================================== */
+.fraction-slider-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fraction-slider-card.blue-theme {
+  border-left: 4px solid #38BDF8;
+}
+
+.fraction-slider-card.pink-theme {
+  border-left: 4px solid #F472B6;
+}
+
+.slider-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label-badge-blue {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  color: #38BDF8;
+}
+
+.label-badge-pink {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  color: #F472B6;
+}
+
+.fraction-value-tag {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50px;
+  padding: 3px 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.slider-input-blue {
+  flex: 1;
+  accent-color: #38BDF8;
+  height: 8px;
+}
+
+.slider-input-pink {
+  flex: 1;
+  accent-color: #F472B6;
+  height: 8px;
+}
+
+.select-den-custom {
+  background: #120B2E;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.visual-fraction-bar-row {
+  display: flex;
+  height: 28px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  margin-top: 4px;
+}
+
+.fraction-bar-cell {
+  flex: 1;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.fraction-bar-cell.cell-shaded-blue {
+  background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+  color: #ffffff;
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.fraction-bar-cell.cell-shaded-pink {
+  background: linear-gradient(135deg, #DB2777 0%, #F472B6 100%);
+  color: #ffffff;
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.worked-solution-card-attractive {
+  width: 100%;
+  background: rgba(22, 14, 48, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+}
+
+.worked-header-pill {
+  background: rgba(255, 193, 7, 0.12);
+  border: 1.5px solid #FFC107;
+  border-radius: 50px;
+  padding: 4px 18px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  color: #FFC107;
+  margin-bottom: 12px;
+}
+
+.math-equation-display-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.eq-op {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.combined-lcd-visual-box {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  padding: 10px 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  width: 100%;
+}
+
+.combined-grid-bar {
+  display: flex;
+  height: 24px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.grid-cell-mini {
+  flex: 1;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.grid-cell-mini.fill-blue {
+  background: #0284C7;
+  color: #ffffff;
+}
+
+.grid-cell-mini.fill-pink {
+  background: #DB2777;
+  color: #ffffff;
+}
+
+.final-result-highlight {
+  background: rgba(255, 193, 7, 0.12);
+  border-radius: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  margin-top: 4px;
+}
+
 
