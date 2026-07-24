@@ -49,15 +49,31 @@ export async function speakText(text, options = {}) {
   stopNarration();
   const thisSpeechId = activeSpeechId;
 
-  // Pronunciation formatting for fraction slash notation
+  // Pronunciation formatting for fraction slash notation & math symbols
   const spokenText = text
+    .replace(/If 3 × 8 = 24, then 24 ÷ 3 = _____/gi, "If 3 times 8 equals 24, then 24 divided by 3 equals what number?")
+    .replace(/(\d+)\s*×\s*(\d+)\s*=\s*(\d+)/gi, "$1 times $2 equals $3")
+    .replace(/(\d+)\s*÷\s*(\d+)\s*=\s*(\d+)/gi, "$1 divided by $2 equals $3")
+    .replace(/(\d+)\s*÷\s*(\d+)/gi, "$1 divided by $2")
     .replace(/1\/2/g, "one half")
     .replace(/1\/3/g, "one third")
     .replace(/2\/3/g, "two thirds")
-    .replace(/1\/4/g, "one quarter")
-    .replace(/3\/4/g, "three quarters")
+    .replace(/1\/4/g, "one fourth")
+    .replace(/3\/4/g, "three fourths")
     .replace(/1\/5/g, "one fifth")
     .replace(/2\/5/g, "two fifths")
+    .replace(/3\/5/g, "three fifths")
+    .replace(/4\/5/g, "four fifths")
+    .replace(/1\/6/g, "one sixth")
+    .replace(/5\/6/g, "five sixths")
+    .replace(/1\/8/g, "one eighth")
+    .replace(/3\/8/g, "three eighths")
+    .replace(/5\/8/g, "five eighths")
+    .replace(/7\/8/g, "seven eighths")
+    .replace(/1\/12/g, "one twelfth")
+    .replace(/5\/12/g, "five twelfths")
+    .replace(/7\/12/g, "seven twelfths")
+    .replace(/11\/12/g, "eleven twelfths")
     .replace(/(\d+)\/(\d+)/g, "$1 over $2");
 
   // Try ElevenLabs API if key is present

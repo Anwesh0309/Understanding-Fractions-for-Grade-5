@@ -1280,6 +1280,64 @@ export const rawQuestionBank = [
   }
 ];
 
+function getUniqueFallbackQuestion(worldId, qNum) {
+  const mult = qNum;
+  if (worldId === "pizza-piazza") {
+    const num = 2 * mult;
+    const den = 3 * mult;
+    const ans = "2/3";
+    return {
+      id: `fallback-w1-${qNum}`,
+      worldId,
+      subtopic: "F1",
+      conceptTitle: `SIMPLIFY ${num}/${den}`,
+      stemText: `Question ${qNum}: Express the fraction ${num}/${den} in its simplest form.`,
+      correctAnswer: ans,
+      options: shuffle([ans, `${num - 1}/${den}`, `${num}/${den - 1}`, `${num + 1}/${den}`], qNum * 41),
+      narrationText: `Question ${qNum}: Express the fraction ${num}/${den} in its simplest form.`
+    };
+  } else if (worldId === "ribbon-row") {
+    const n1 = mult, d1 = mult + 1;
+    const n2 = mult, d2 = mult + 3;
+    return {
+      id: `fallback-w2-${qNum}`,
+      worldId,
+      subtopic: "F2",
+      conceptTitle: `COMPARE FRACTIONS #${qNum}`,
+      stemText: `Question ${qNum}: Which fraction is larger: ${n1}/${d1} or ${n2}/${d2}?`,
+      correctAnswer: `${n1}/${d1}`,
+      options: shuffle([`${n1}/${d1}`, `${n2}/${d2}`, "They are equal", `${n1 + 1}/${d1}`], qNum * 41),
+      narrationText: `Question ${qNum}: Which fraction is larger: ${n1} over ${d1} or ${n2} over ${d2}?`
+    };
+  } else if (worldId === "bakery-blend") {
+    const n1 = mult, n2 = mult + 1, den = 12;
+    const sum = n1 + n2;
+    return {
+      id: `fallback-w3-${qNum}`,
+      worldId,
+      subtopic: "F3",
+      conceptTitle: `ADD LIKE FRACTIONS #${qNum}`,
+      stemText: `Question ${qNum}: Add the fractions ${n1}/${den} + ${n2}/${den}.`,
+      correctAnswer: `${sum}/${den}`,
+      options: shuffle([`${sum}/${den}`, `${sum - 1}/${den}`, `${sum + 1}/${den}`, `${sum}/${den * 2}`], qNum * 41),
+      narrationText: `Question ${qNum}: Add the fractions ${n1}/${den} plus ${n2}/${den}.`
+    };
+  } else {
+    const val1 = mult;
+    const val2 = mult + 2;
+    return {
+      id: `fallback-gen-${worldId}-${qNum}`,
+      worldId,
+      subtopic: "F4",
+      conceptTitle: `FRACTION PRACTICE #${qNum}`,
+      stemText: `Question ${qNum}: Solve: What is ${val1}/10 + ${val2}/10?`,
+      correctAnswer: `${val1 + val2}/10`,
+      options: shuffle([`${val1 + val2}/10`, `${val1 + val2 - 1}/10`, `${val1 + val2 + 1}/10`, `${val1}/10`], qNum * 41),
+      narrationText: `Question ${qNum}: Solve: What is ${val1}/10 plus ${val2}/10?`
+    };
+  }
+}
+
 export function getRoundQuestions(worldId, count = 10) {
   try {
     let worldTemplates = rawQuestionBank.filter(q => q && q.worldId === worldId);
@@ -1287,54 +1345,76 @@ export function getRoundQuestions(worldId, count = 10) {
       worldTemplates = rawQuestionBank;
     }
 
-    let pool = [...worldTemplates];
-    while (pool.length < count) {
-      pool = pool.concat(worldTemplates);
-    }
+    const resultQuestions = [];
+    const seenStems = new Set();
+    const baseTimestamp = Date.now();
 
-    const selectedTemplates = shuffle(pool, Date.now() + Math.floor(Math.random() * 1000)).slice(0, count);
+    let attempts = 0;
+    while (resultQuestions.length < count && attempts < 150) {
+      attempts++;
+      const templateIdx = (resultQuestions.length + attempts) % worldTemplates.length;
+      const template = worldTemplates[templateIdx];
 
-    return selectedTemplates.map((template, idx) => {
-      const seed = Date.now() + idx * 77 + Math.floor(Math.random() * 500);
+      const seed = baseTimestamp + resultQuestions.length * 997 + attempts * 137;
       let generated;
       try {
         generated = template.generate ? template.generate(seed) : template;
       } catch (e) {
-        generated = {
-          stemText: "If 3 × 8 = 24, then 24 ÷ 3 = _____",
-          correctAnswer: "8",
-          distractors: ["7", "6", "10"],
-          narrationText: "If 3 × 8 = 24, then 24 ÷ 3 = _____"
-        };
+        generated = null;
       }
 
-      const stemText = generated.stemText || "If 3 × 8 = 24, then 24 ÷ 3 = _____";
-      const correctAnswer = String(generated.correctAnswer || "8");
-      const distractors = (generated.distractors || ["7", "6", "10"]).map(String);
-      const options = shuffle([correctAnswer, ...distractors], seed + 99);
+      if (!generated || !generated.stemText) continue;
 
-      return {
-        id: `${template.id || 'q'}-${idx}`,
-        worldId: template.worldId || worldId,
-        subtopic: template.subtopic || "F1",
-        conceptTitle: template.conceptTitle || "DIVISION GROUPING",
-        stemText,
-        correctAnswer,
-        options,
-        narrationText: generated.narrationText || stemText
-      };
-    });
+      let stemText = generated.stemText;
+      let correctAnswer = String(generated.correctAnswer || "");
+      let distractors = (generated.distractors || []).map(String);
+
+      // If duplicate stem text, perturb with altSeed
+      if (seenStems.has(stemText) && template.generate) {
+        const altSeed = seed + attempts * 53;
+        try {
+          generated = template.generate(altSeed);
+          stemText = generated.stemText;
+          correctAnswer = String(generated.correctAnswer);
+          distractors = (generated.distractors || []).map(String);
+        } catch(e) {}
+      }
+
+      if (!seenStems.has(stemText)) {
+        seenStems.add(stemText);
+        const options = shuffle([correctAnswer, ...distractors], seed + 99);
+
+        resultQuestions.push({
+          id: `${template.id || 'q'}-${resultQuestions.length + 1}`,
+          worldId: template.worldId || worldId,
+          subtopic: template.subtopic || "F1",
+          conceptTitle: template.conceptTitle || "FRACTION PRACTICE",
+          stemText,
+          correctAnswer,
+          options,
+          narrationText: generated.narrationText || stemText
+        });
+      }
+    }
+
+    // If still under count, fill with guaranteed unique world questions
+    while (resultQuestions.length < count) {
+      const qNum = resultQuestions.length + 1;
+      const fallbackQ = getUniqueFallbackQuestion(worldId, qNum);
+      if (!seenStems.has(fallbackQ.stemText)) {
+        seenStems.add(fallbackQ.stemText);
+        resultQuestions.push(fallbackQ);
+      } else {
+        fallbackQ.stemText = `Challenge Question ${qNum}: Express ${qNum * 2}/${qNum * 3} in simplest form.`;
+        fallbackQ.correctAnswer = "2/3";
+        fallbackQ.options = shuffle(["2/3", "3/4", "1/2", "4/5"], qNum * 17);
+        resultQuestions.push(fallbackQ);
+      }
+    }
+
+    return resultQuestions;
   } catch (err) {
     console.error("getRoundQuestions error:", err);
-    return Array.from({ length: count }).map((_, i) => ({
-      id: `fallback-${i}`,
-      worldId: worldId || "pizza-piazza",
-      subtopic: "F1",
-      conceptTitle: "DIVISION GROUPING",
-      stemText: "If 3 × 8 = 24, then 24 ÷ 3 = _____",
-      correctAnswer: "8",
-      options: ["8", "7", "6", "10"],
-      narrationText: "If 3 × 8 = 24, then 24 ÷ 3 = _____"
-    }));
+    return Array.from({ length: count }).map((_, i) => getUniqueFallbackQuestion(worldId, i + 1));
   }
 }
