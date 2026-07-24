@@ -2479,4 +2479,124 @@ body, html {
   margin-top: 4px;
 }
 
+/* ==========================================================================
+   PRACTICE PHASE WORLD GRID STYLING (matching SS 100%)
+   ========================================================================== */
+.play-world-grid-wrapper-ss {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.world-grid-title-ss {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.world-grid-subtitle-ss {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 14px;
+}
+
+.worlds-grid-2x5-ss {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  width: 100%;
+  max-width: 860px;
+}
+
+.world-card-tile-ss {
+  background: rgba(22, 14, 48, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  height: 160px;
+  position: relative;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s ease;
+}
+
+.world-card-tile-ss.unlocked {
+  cursor: pointer;
+}
+
+.world-card-tile-ss.unlocked:hover {
+  transform: translateY(-4px);
+  border-color: #E91E63;
+  box-shadow: 0 12px 30px rgba(233, 30, 99, 0.4);
+}
+
+.world-card-tile-ss.locked {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.card-top-lock-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.world-tile-emoji {
+  font-size: 32px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.world-tile-name {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.world-tile-qrange {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+.btn-practice-pink-pill {
+  background: linear-gradient(135deg, #E91E63 0%, #D81B60 100%);
+  border: 1.5px solid #ffffff;
+  border-radius: 50px;
+  padding: 6px 18px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(233, 30, 99, 0.5);
+  margin-top: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-practice-pink-pill:hover {
+  transform: scale(1.05);
+}
+
 

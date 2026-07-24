@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { worldsData } from '../../data/worlds';
 import { getRoundQuestions } from '../../data/questionBank';
-import { MascotBubble } from '../shell/MascotBubble';
 import { speakText } from '../../utils/audio';
-import { Flame, Heart, Star, Lock, ArrowLeft, Trophy, Sparkles } from 'lucide-react';
+import { Flame, Heart, Star, Lock, ArrowLeft, Sparkles } from 'lucide-react';
 
 export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
   const [selectedWorldId, setSelectedWorldId] = useState(null);
@@ -17,29 +16,39 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
         onFinishRound={(results) => {
           onUpdateProgress(results);
           setInRound(false);
-          // If all 10 worlds have been played or user completed a round, allow Reflect transition
-          onComplete();
+          if (results.passed) {
+            // Check if all worlds are complete
+            onComplete();
+          }
         }}
         onBackToWorlds={() => setInRound(false)}
       />
     );
   }
 
-  // WORLD SELECT GRID VIEW
+  // WORLD SELECT GRID VIEW (EXACT MATCH TO SCREENSHOT)
   return (
-    <div className="play-world-grid-wrapper">
+    <div className="play-world-grid-wrapper-ss">
       <div className="world-grid-header flex flex-col items-center">
-        <h2 className="world-grid-title">10 Fraction Game Worlds 🌟</h2>
-        <p className="world-grid-subtitle">Earn at least 2 stars in each world to unlock the next challenge!</p>
+        <h2 className="world-grid-title-ss">
+          🎮 Practice — Choose Your World!
+        </h2>
+        <p className="world-grid-subtitle-ss">
+          Answer questions in each world. Earn stars and XP!
+        </p>
       </div>
 
-      <div className="worlds-grid-2x5">
+      <div className="worlds-grid-2x5-ss">
         {worldsData.map((world, idx) => {
-          const worldState = progress.worlds[world.id] || { stars: 0, unlocked: idx === 0 };
-          
-          // World N is unlocked if it's World 1 OR if World N-1 has >= 2 stars or is unlocked
+          const worldState = progress?.worlds?.[world.id] || {};
+
+          // World 1 (idx 0) is unlocked. World N is unlocked ONLY if World N-1 has been completed
           const prevWorldId = idx > 0 ? worldsData[idx - 1].id : null;
-          const isUnlocked = idx === 0 || (prevWorldId && (progress.worlds[prevWorldId]?.stars >= 2 || progress.worlds[prevWorldId]?.unlocked));
+          const prevWorldState = prevWorldId ? progress?.worlds?.[prevWorldId] : null;
+          const isUnlocked = idx === 0 || prevWorldState?.completed || worldState.unlocked;
+
+          const questionRangeStart = idx * 10 + 1;
+          const questionRangeEnd = (idx + 1) * 10;
 
           return (
             <div
@@ -50,34 +59,31 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
                   setInRound(true);
                 }
               }}
-              className={`world-card-tile ${isUnlocked ? 'unlocked' : 'locked'}`}
+              className={`world-card-tile-ss ${isUnlocked ? 'unlocked' : 'locked'}`}
             >
-              <div className="world-tile-header">
-                <span className="world-icon">{world.icon}</span>
-                <span className="world-num-badge">W{world.num}</span>
-              </div>
-
-              <h3 className="world-name">{world.name}</h3>
-              <p className="world-subtopic-tag">{world.subtopicTitle}</p>
-
-              <div className="world-tile-stars-row">
-                {[1, 2, 3].map(starNum => (
-                  <Star
-                    key={starNum}
-                    className={`w-4 h-4 ${starNum <= (worldState.stars || 0) ? 'text-amber-300 fill-amber-300' : 'text-gray-500'}`}
-                  />
-                ))}
-              </div>
-
+              {/* Lock icon top-right if locked */}
               {!isUnlocked && (
-                <div className="lock-overlay">
-                  <Lock className="w-5 h-5 text-gray-400 mb-1" />
-                  <span className="lock-text">Earn 2★ in W{idx}</span>
+                <div className="card-top-lock-icon">
+                  <Lock className="w-3.5 h-3.5 text-gray-400" />
                 </div>
               )}
 
+              {/* Emoji Icon */}
+              <div className="world-tile-emoji">{world.icon}</div>
+
+              {/* World Name */}
+              <h3 className="world-tile-name">{world.name}</h3>
+
+              {/* Question Range */}
+              <p className="world-tile-qrange">
+                Questions {questionRangeStart}–{questionRangeEnd}
+              </p>
+
+              {/* Unlocked Pink Button */}
               {isUnlocked && (
-                <button className="btn-play-world-pill">PLAY 🎮</button>
+                <button className="btn-practice-pink-pill">
+                  ▶ PRACTICE
+                </button>
               )}
             </div>
           );
@@ -87,20 +93,21 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
   );
 }
 
-// IN-ROUND PLAY VIEW
+// IN-ROUND PRACTICE QUIZ VIEW (10 Qs, 3 Hearts, 4+ Passing rule, 1-sec simulation popups)
 function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
   const world = worldsData.find(w => w.id === worldId);
   const [questions, setQuestions] = useState([]);
   const [qIdx, setQIdx] = useState(0);
-  const [starsEarned, setStarsEarned] = useState(0);
   const [lives, setLives] = useState(3);
   const [streak, setStreak] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [feedbackPopup, setFeedbackPopup] = useState(null); // simulation popup format
 
   useEffect(() => {
-    const roundQ = getRoundQuestions(worldId, 8);
+    // 10 Questions per world round
+    const roundQ = getRoundQuestions(worldId, 10);
     setQuestions(roundQ);
   }, [worldId]);
 
@@ -108,13 +115,30 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
 
   useEffect(() => {
     if (currentQ) {
-      speakText(currentQ.narrationText);
+      speakText(currentQ.narrationText || currentQ.stemText);
       setSelectedOption(null);
       setIsAnswered(false);
     }
   }, [qIdx, questions]);
 
-  if (!currentQ) return <div className="p-8 text-white text-center font-bold">Loading questions...</div>;
+  // REQUIREMENT: Auto-close popup after 1 second (1000ms) and advance to next question
+  useEffect(() => {
+    if (feedbackPopup) {
+      const timer = setTimeout(() => {
+        setFeedbackPopup(null);
+        handleAdvanceAfterPopup();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedbackPopup]);
+
+  if (!currentQ) {
+    return (
+      <div className="p-8 text-white text-center font-bold">
+        Loading 10 Questions for {world?.name || 'World'}...
+      </div>
+    );
+  }
 
   const handleSelectAnswer = (option) => {
     if (isAnswered) return;
@@ -124,50 +148,47 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
     const isCorrect = option === currentQ.correctAnswer;
 
     if (isCorrect) {
-      const newStreak = streak + 1;
       const newScore = score + 1;
-      setStreak(newStreak);
+      const newStreak = streak + 1;
       setScore(newScore);
+      setStreak(newStreak);
 
-      speakText("Correct! Wonderful job!");
-
-      setTimeout(() => {
-        advanceNextQuestion(newScore, lives);
-      }, 1400);
+      setFeedbackPopup({
+        type: 'correct',
+        message: `Correct! ${currentQ.explanation || 'Great job!'}`
+      });
+      speakText("Correct!");
     } else {
       const newLives = lives - 1;
       setLives(newLives);
       setStreak(0);
 
-      speakText(`Not quite right! The correct answer is ${currentQ.correctAnswer}`);
-
-      setTimeout(() => {
-        if (newLives <= 0) {
-          // Round finished due to 0 lives
-          finishRound(score, 0);
-        } else {
-          advanceNextQuestion(score, newLives);
-        }
-      }, 2000);
+      setFeedbackPopup({
+        type: 'wrong',
+        message: `The correct answer is ${currentQ.correctAnswer}`
+      });
+      speakText(`Not quite! The correct answer is ${currentQ.correctAnswer}`);
     }
   };
 
-  const advanceNextQuestion = (currentScore, currentLives) => {
-    if (qIdx < questions.length - 1) {
-      setQIdx(prev => prev + 1);
+  const handleAdvanceAfterPopup = () => {
+    // Check if round finishes due to 0 lives or last question
+    if (lives <= 0 || qIdx >= questions.length - 1) {
+      finishRound(score, lives);
     } else {
-      finishRound(currentScore, currentLives);
+      setQIdx(prev => prev + 1);
     }
   };
 
-  const finishRound = (finalScore, finalLives) => {
-    const pct = finalScore / questions.length;
-    const stars = pct >= 1 ? 3 : pct >= 0.75 ? 2 : pct >= 0.5 ? 1 : 0;
+  const finishRound = (finalScore) => {
+    // PASSING RULE: At least 4 correct answers out of 10 to pass & unlock next world!
+    const passed = finalScore >= 4;
     onFinishRound({
       worldId,
       score: finalScore,
       total: questions.length,
-      stars
+      passed,
+      unlockedNext: passed
     });
   };
 
@@ -187,9 +208,10 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
           <div className="stats-pills-row">
             <div className="stat-pill-item text-amber-300">
               <Star className="w-4 h-4 fill-amber-300 inline mr-1" />
-              <span>{score} pts</span>
+              <span>{score} / 10</span>
             </div>
 
+            {/* 3 Hearts Indicator */}
             <div className="stat-pill-item text-rose-400">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Heart
@@ -222,7 +244,7 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
         <div className="play-main-glass-card">
           <div className="top-orange-concept-badge">
             <Sparkles className="w-3.5 h-3.5 inline mr-1" />
-            {currentQ.conceptTitle || "FRACTION CHALLENGE"}
+            {currentQ.conceptTitle || "FRACTION PRACTICE"}
           </div>
 
           <h2 className="play-q-stem-title">{currentQ.stemText}</h2>
@@ -256,6 +278,26 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
           </div>
         </div>
       </div>
+
+      {/* REQUIREMENT: SIMULATION PHASE POPUPS FOR PRACTICE PHASE (1-SEC DURATION) */}
+      {feedbackPopup && (
+        <div className="feedback-modal-backdrop-ss" onClick={() => setFeedbackPopup(null)}>
+          <div
+            className={`feedback-modal-card-ss ${feedbackPopup.type === 'correct' ? 'card-success-green' : 'card-error-red'}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="modal-emoji-top">
+              {feedbackPopup.type === 'correct' ? '🎉' : '🥺'}
+            </div>
+
+            <h3 className="modal-title-ss">
+              {feedbackPopup.type === 'correct' ? 'Correct! 🎉' : 'Not quite!'}
+            </h3>
+
+            <p className="modal-message-ss">{feedbackPopup.message}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

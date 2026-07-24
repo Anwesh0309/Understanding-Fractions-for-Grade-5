@@ -62,24 +62,35 @@ export default function App() {
     setIsIntroScreen(false);
   };
 
-  const handleUpdateWorldProgress = ({ worldId, score, total, stars }) => {
+  const handleUpdateWorldProgress = ({ worldId, score, total, passed }) => {
     setProgress(prev => {
       const worldState = prev.worlds[worldId] || {};
-      const newStars = Math.max(worldState.stars || 0, stars);
       const newXP = prev.xp + score * 10;
-      
+
+      const nextWorldIdx = worldsData.findIndex(w => w.id === worldId) + 1;
+      const nextWorldId = nextWorldIdx < worldsData.length ? worldsData[nextWorldIdx].id : null;
+
+      const newWorlds = {
+        ...prev.worlds,
+        [worldId]: {
+          attempts: (worldState.attempts || 0) + 1,
+          bestScore: Math.max(worldState.bestScore || 0, score),
+          completed: worldState.completed || passed,
+          unlocked: true
+        }
+      };
+
+      if (passed && nextWorldId) {
+        newWorlds[nextWorldId] = {
+          ...(newWorlds[nextWorldId] || {}),
+          unlocked: true
+        };
+      }
+
       return {
         ...prev,
         xp: newXP,
-        worlds: {
-          ...prev.worlds,
-          [worldId]: {
-            attempts: (worldState.attempts || 0) + 1,
-            bestScore: Math.max(worldState.bestScore || 0, score),
-            stars: newStars,
-            unlocked: true
-          }
-        }
+        worlds: newWorlds
       };
     });
   };
