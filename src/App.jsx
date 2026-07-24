@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import { PhaseTracker } from './components/shell/PhaseTracker';
 import { AudioToggle } from './components/shell/AudioToggle';
 import { WonderPhase } from './components/phases/WonderPhase';
@@ -6,7 +6,41 @@ import { StoryPhase } from './components/phases/StoryPhase';
 import { SimulatePhase } from './components/phases/SimulatePhase';
 import { PlayPhase } from './components/phases/PlayPhase';
 import { ReflectPhase } from './components/phases/ReflectPhase';
+import { worldsData } from './data/worlds';
 import './App.css';
+
+// Safety Error Boundary to completely prevent blank screen
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 text-center text-white font-bold flex flex-col items-center justify-center min-h-screen">
+          <h2 className="text-2xl mb-4">Something went wrong</h2>
+          <button
+            onClick={() => {
+              this.setState({ hasError: false });
+              window.location.reload();
+            }}
+            className="btn-practice-pink-pill"
+          >
+            🔄 Reload App
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const LOCAL_STORAGE_KEY = "fractionverse_360_progress";
 
@@ -97,7 +131,8 @@ export default function App() {
   const showTopHeader = !(currentPhase === "wonder" && isIntroScreen);
 
   return (
-    <div className="app-shell-viewport">
+    <ErrorBoundary>
+      <div className="app-shell-viewport">
       {/* Background Floating Fraction Symbols */}
       <div className="bg-floating-symbols">
         <span className="symbol sym-1">½</span>
@@ -184,5 +219,6 @@ export default function App() {
         )}
       </main>
     </div>
-  );
+  </ErrorBoundary>
+);
 }

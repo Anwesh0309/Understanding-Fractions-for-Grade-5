@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { worldsData } from '../../data/worlds';
 import { getRoundQuestions } from '../../data/questionBank';
 import { speakText } from '../../utils/audio';
-import { Flame, Star, Lock, ArrowLeft, Sparkles } from 'lucide-react';
+import { Flame, Star, Lock, ArrowLeft, Sparkles, RefreshCw, ArrowRight } from 'lucide-react';
 
 export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
   const [selectedWorldId, setSelectedWorldId] = useState("pizza-piazza");
   const [inRound, setInRound] = useState(false);
 
   const handleLaunchWorld = (e, worldId) => {
-    if (e) e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     setSelectedWorldId(worldId);
     setInRound(true);
   };
@@ -19,10 +19,17 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
     return (
       <PlayRoundView
         worldId={selectedWorldId}
+        progress={progress}
+        onUpdateProgress={onUpdateProgress}
+        onLaunchNextWorld={(nextId) => {
+          setSelectedWorldId(nextId);
+          setInRound(true);
+        }}
         onFinishRound={(results) => {
           onUpdateProgress(results);
           setInRound(false);
-          if (results.passed) {
+          // Only trigger onComplete when final World 10 is finished
+          if (results.passed && results.worldId === "puzzle-peak") {
             onComplete();
           }
         }}
@@ -50,7 +57,7 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
           // World 1 (idx 0) is unlocked. World N is unlocked ONLY if World N-1 has completed === true!
           const prevWorldId = idx > 0 ? worldsData[idx - 1].id : null;
           const prevWorldState = prevWorldId ? progress?.worlds?.[prevWorldId] : null;
-          const isUnlocked = idx === 0 || (prevWorldState && prevWorldState.completed === true);
+          const isUnlocked = idx === 0 || (prevWorldState && prevWorldState.completed === true) || worldState.unlocked === true;
 
           const questionRangeStart = idx * 10 + 1;
           const questionRangeEnd = (idx + 1) * 10;
@@ -97,7 +104,7 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
 }
 
 // IN-ROUND PRACTICE QUIZ VIEW (EXACT MATCH TO QUESTION SCREENSHOT)
-function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
+function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld, onFinishRound, onBackToWorlds }) {
   const world = worldsData.find(w => w.id === worldId) || worldsData[0];
   const [questions, setQuestions] = useState(() => getRoundQuestions(world.id, 10));
   const [qIdx, setQIdx] = useState(0);
@@ -107,6 +114,7 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [feedbackPopup, setFeedbackPopup] = useState(null);
+  const [summaryModal, setSummaryModal] = useState(null); // { passed: boolean, score: number, total: number }
 
   useEffect(() => {
     const qList = getRoundQuestions(world.id, 10);
@@ -115,19 +123,27 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
     setScore(0);
     setLives(3);
     setStreak(0);
+    setSummaryModal(null);
   }, [worldId]);
 
-  const currentQ = questions[qIdx] || questions[0];
+  const currentQ = questions[qIdx] || questions[0] || {
+    id: 'fallback-0',
+    conceptTitle: 'DIVISION GROUPING',
+    stemText: 'If 3 × 8 = 24, then 24 ÷ 3 = _____',
+    correctAnswer: '8',
+    options: ['8', '7', '6', '10'],
+    narrationText: 'If 3 × 8 = 24, then 24 ÷ 3 = _____'
+  };
 
   useEffect(() => {
-    if (currentQ) {
+    if (currentQ && !summaryModal) {
       speakText(currentQ.narrationText || currentQ.stemText);
       setSelectedOption(null);
       setIsAnswered(false);
     }
-  }, [qIdx, questions]);
+  }, [qIdx, questions, summaryModal]);
 
-  // REQUIREMENT: Auto-close popup after 1 second (1000ms) and advance to next question
+  // REQUIREMENT: Auto-close feedback popup after 1 second (1000ms) and advance to next question
   useEffect(() => {
     if (feedbackPopup) {
       const timer = setTimeout(() => {
@@ -139,7 +155,7 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
   }, [feedbackPopup]);
 
   const handleSelectAnswer = (option) => {
-    if (isAnswered) return;
+    if (isAnswered || summaryModal) return;
     setSelectedOption(option);
     setIsAnswered(true);
 
@@ -171,21 +187,51 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
 
   const handleAdvanceAfterPopup = () => {
     if (lives <= 0 || qIdx >= questions.length - 1) {
-      finishRound(score);
+      triggerSummary(score);
     } else {
       setQIdx(prev => prev + 1);
     }
   };
 
-  const finishRound = (finalScore) => {
+  const triggerSummary = (finalScore) => {
     const passed = finalScore >= 4; // Passing rule: at least 4 correct answers out of 10!
-    onFinishRound({
+    onUpdateProgress({
       worldId: world.id,
       score: finalScore,
       total: questions.length,
       passed,
       unlockedNext: passed
     });
+    setSummaryModal({
+      passed,
+      score: finalScore,
+      total: questions.length
+    });
+  };
+
+  const handleRetryCurrentWorld = () => {
+    const qList = getRoundQuestions(world.id, 10);
+    setQuestions(qList);
+    setQIdx(0);
+    setScore(0);
+    setLives(3);
+    setStreak(0);
+    setSummaryModal(null);
+  };
+
+  const handleGoToNextWorld = () => {
+    const currentIdx = worldsData.findIndex(w => w.id === world.id);
+    const nextWorld = worldsData[currentIdx + 1];
+    if (nextWorld) {
+      onLaunchNextWorld(nextWorld.id);
+    } else {
+      onFinishRound({
+        worldId: world.id,
+        score,
+        total: questions.length,
+        passed: true
+      });
+    }
   };
 
   const progressPct = Math.round(((qIdx + 1) / questions.length) * 100);
@@ -232,7 +278,7 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
           {/* Orange Concept Badge */}
           <div className="top-orange-badge-ss">
             <Sparkles className="w-3.5 h-3.5 inline mr-1" />
-            {currentQ.conceptTitle || "FRACTION PRACTICE"}
+            {currentQ.conceptTitle || "DIVISION GROUPING"}
           </div>
 
           {/* Stem Text */}
@@ -268,8 +314,8 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
         </div>
       </div>
 
-      {/* REQUIREMENT: SIMULATION PHASE POPUPS FOR PRACTICE PHASE (1-SEC AUTO-CLOSE) */}
-      {feedbackPopup && (
+      {/* 1-SECOND FEEDBACK POPUP */}
+      {feedbackPopup && !summaryModal && (
         <div className="feedback-modal-backdrop-ss" onClick={() => setFeedbackPopup(null)}>
           <div
             className={`feedback-modal-card-ss ${feedbackPopup.type === 'correct' ? 'card-success-green' : 'card-error-red'}`}
@@ -284,6 +330,49 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
             </h3>
 
             <p className="modal-message-ss">{feedbackPopup.message}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ROUND END SUMMARY / RETRY MODAL (NO BLANK SCREEN EVER!) */}
+      {summaryModal && (
+        <div className="feedback-modal-backdrop-ss">
+          <div className={`feedback-modal-card-ss ${summaryModal.passed ? 'card-success-green' : 'card-error-red'}`}>
+            <div className="modal-emoji-top">
+              {summaryModal.passed ? '🏆' : '💔'}
+            </div>
+
+            <h3 className="modal-title-ss">
+              {summaryModal.passed ? 'World Completed! 🎉' : 'Keep Trying!'}
+            </h3>
+
+            <p className="modal-message-ss">
+              {summaryModal.passed
+                ? `Awesome! You scored ${summaryModal.score} out of 10 and unlocked the next world!`
+                : `You scored ${summaryModal.score} out of 10. You need at least 4 correct answers to unlock the next world.`}
+            </p>
+
+            <div className="flex gap-3 mt-4 w-full justify-center">
+              {summaryModal.passed ? (
+                <>
+                  <button onClick={onBackToWorlds} className="btn-sim-prev">
+                    <ArrowLeft className="w-4 h-4 mr-1" /> World Grid
+                  </button>
+                  <button onClick={handleGoToNextWorld} className="btn-sim-complete-gold">
+                    Next World <ArrowRight className="w-4 h-4 ml-1" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={onBackToWorlds} className="btn-sim-prev">
+                    <ArrowLeft className="w-4 h-4 mr-1" /> World Grid
+                  </button>
+                  <button onClick={handleRetryCurrentWorld} className="btn-sim-complete-gold">
+                    Retry World <RefreshCw className="w-4 h-4 ml-1" />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
