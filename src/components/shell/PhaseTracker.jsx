@@ -34,13 +34,13 @@ export function PhaseTracker({ currentPhase, completedPhases, onPhaseSelect }) {
             className={`phase-pill-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${!isUnlocked ? 'locked' : ''}`}
             title={!isUnlocked ? `Complete Phase ${PHASES[idx-1].num} (${PHASES[idx-1].label}) first!` : phase.label}
           >
-            <span className="phase-pill-status-icon">
+            <span className={`phase-pill-status-icon ${isCompleted ? 'badge-completed-green' : isActive ? 'badge-active-gold' : ''}`}>
               {isCompleted ? (
-                <Check className="w-4 h-4 text-emerald-400 font-bold" />
+                <Check className="w-3.5 h-3.5 text-white font-bold" />
               ) : !isUnlocked ? (
-                <Lock className="w-3.5 h-3.5 text-gray-400" />
+                <Lock className="w-3 h-3 text-gray-400" />
               ) : (
-                <span className="phase-num-badge">{phase.num}</span>
+                <span className="phase-num-text">{phase.num}</span>
               )}
             </span>
 

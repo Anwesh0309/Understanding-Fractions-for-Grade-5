@@ -8,6 +8,10 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
   const [showTeaser, setShowTeaser] = useState(false);
 
   useEffect(() => {
+    setShowPuzzle(!isIntroScreen);
+  }, [isIntroScreen]);
+
+  useEffect(() => {
     if (showPuzzle) {
       speakText(wonderData.puzzleCard.narration);
     }
