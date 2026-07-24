@@ -138,14 +138,6 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
     }
   }, [feedbackPopup]);
 
-  if (!currentQ) {
-    return (
-      <div className="p-8 text-white text-center font-bold">
-        Loading Questions for {world.name}...
-      </div>
-    );
-  }
-
   const handleSelectAnswer = (option) => {
     if (isAnswered) return;
     setSelectedOption(option);

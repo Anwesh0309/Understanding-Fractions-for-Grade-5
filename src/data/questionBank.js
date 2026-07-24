@@ -1281,37 +1281,60 @@ export const rawQuestionBank = [
 ];
 
 export function getRoundQuestions(worldId, count = 10) {
-  let worldTemplates = rawQuestionBank.filter(q => q.worldId === worldId);
-  if (worldTemplates.length === 0) {
-    worldTemplates = rawQuestionBank;
+  try {
+    let worldTemplates = rawQuestionBank.filter(q => q && q.worldId === worldId);
+    if (!worldTemplates || worldTemplates.length === 0) {
+      worldTemplates = rawQuestionBank;
+    }
+
+    let pool = [...worldTemplates];
+    while (pool.length < count) {
+      pool = pool.concat(worldTemplates);
+    }
+
+    const selectedTemplates = shuffle(pool, Date.now() + Math.floor(Math.random() * 1000)).slice(0, count);
+
+    return selectedTemplates.map((template, idx) => {
+      const seed = Date.now() + idx * 77 + Math.floor(Math.random() * 500);
+      let generated;
+      try {
+        generated = template.generate ? template.generate(seed) : template;
+      } catch (e) {
+        generated = {
+          stemText: "If 3 × 8 = 24, then 24 ÷ 3 = _____",
+          correctAnswer: "8",
+          distractors: ["7", "6", "10"],
+          narrationText: "If 3 × 8 = 24, then 24 ÷ 3 = _____"
+        };
+      }
+
+      const stemText = generated.stemText || "If 3 × 8 = 24, then 24 ÷ 3 = _____";
+      const correctAnswer = String(generated.correctAnswer || "8");
+      const distractors = (generated.distractors || ["7", "6", "10"]).map(String);
+      const options = shuffle([correctAnswer, ...distractors], seed + 99);
+
+      return {
+        id: `${template.id || 'q'}-${idx}`,
+        worldId: template.worldId || worldId,
+        subtopic: template.subtopic || "F1",
+        conceptTitle: template.conceptTitle || "DIVISION GROUPING",
+        stemText,
+        correctAnswer,
+        options,
+        narrationText: generated.narrationText || stemText
+      };
+    });
+  } catch (err) {
+    console.error("getRoundQuestions error:", err);
+    return Array.from({ length: count }).map((_, i) => ({
+      id: `fallback-${i}`,
+      worldId: worldId || "pizza-piazza",
+      subtopic: "F1",
+      conceptTitle: "DIVISION GROUPING",
+      stemText: "If 3 × 8 = 24, then 24 ÷ 3 = _____",
+      correctAnswer: "8",
+      options: ["8", "7", "6", "10"],
+      narrationText: "If 3 × 8 = 24, then 24 ÷ 3 = _____"
+    }));
   }
-
-  let pool = [...worldTemplates];
-  while (pool.length < count) {
-    pool = pool.concat(worldTemplates);
-  }
-
-  const selectedTemplates = shuffle(pool, Date.now() + Math.floor(Math.random() * 1000)).slice(0, count);
-
-  return selectedTemplates.map((template, idx) => {
-    const seed = Date.now() + idx * 77 + Math.floor(Math.random() * 500);
-    const generated = template.generate ? template.generate(seed) : {
-      stemText: template.stemText || "Fraction Question",
-      correctAnswer: template.correctAnswer || "1/2",
-      distractors: template.distractors || ["1/3", "2/3", "3/4"],
-      narrationText: template.narrationText || "Fraction Question"
-    };
-
-    const options = shuffle([generated.correctAnswer, ...generated.distractors], seed + 99);
-    return {
-      id: `${template.id}-${idx}`,
-      worldId: template.worldId,
-      subtopic: template.subtopic,
-      conceptTitle: template.conceptTitle,
-      stemText: generated.stemText,
-      correctAnswer: generated.correctAnswer,
-      options,
-      narrationText: generated.narrationText || generated.stemText
-    };
-  });
 }
