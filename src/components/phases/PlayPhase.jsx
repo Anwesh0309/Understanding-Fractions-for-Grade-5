@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { worldsData } from '../../data/worlds';
 import { getRoundQuestions } from '../../data/questionBank';
 import { speakText } from '../../utils/audio';
-import { Flame, Star, Lock, ArrowLeft, Sparkles, RefreshCw, ArrowRight } from 'lucide-react';
+import { Flame, Star, Lock, Sparkles, RefreshCw, ArrowRight, Heart, Lightbulb, ArrowLeft } from 'lucide-react';
 
 export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
   const [selectedWorldId, setSelectedWorldId] = useState("pizza-piazza");
@@ -28,7 +28,6 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
         onFinishRound={(results) => {
           onUpdateProgress(results);
           setInRound(false);
-          // Only trigger onComplete when final World 10 is finished
           if (results.passed && results.worldId === "puzzle-peak") {
             onComplete();
           }
@@ -103,7 +102,79 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
   );
 }
 
-// IN-ROUND PRACTICE QUIZ VIEW (EXACT MATCH TO QUESTION SCREENSHOT)
+// VISUAL DIAGRAM / CHART COMPONENT FOR QUESTIONS
+function QuestionVisualDiagram({ question }) {
+  const text = question?.stemText || "";
+  
+  // Check for fraction pattern like "2/5" or "8/12"
+  const fracMatch = text.match(/(\d+)\/(\d+)/);
+  if (fracMatch) {
+    const num = Math.min(parseInt(fracMatch[1], 10) || 1, 20);
+    const den = Math.min(parseInt(fracMatch[2], 10) || 2, 20);
+    if (den > 0) {
+      return (
+        <div className="q-visual-chart-container">
+          <div className="chart-title-tag">Visual Fraction Bar ({num}/{den})</div>
+          <div className="fraction-bar-visual-flex">
+            {Array.from({ length: den }).map((_, i) => (
+              <div
+                key={i}
+                className={`fraction-bar-slice ${
+                  i < num ? 'slice-shaded-gold' : 'slice-empty'
+                }`}
+              >
+                1/{den}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // Check for multiplication / division pattern like "3 x 8 = 24" or "24 / 3"
+  const divMatch = text.match(/(\d+)\s*[×x*÷]\s*(\d+)/);
+  if (divMatch) {
+    const groupCount = Math.min(parseInt(divMatch[1], 10) || 3, 6);
+    const itemsPerGroup = Math.min(parseInt(divMatch[2], 10) || 8, 8);
+    return (
+      <div className="q-visual-chart-container">
+        <div className="chart-title-tag">Visual Grouping Diagram</div>
+        <div className="grouping-visual-grid">
+          {Array.from({ length: groupCount }).map((_, g) => (
+            <div key={g} className="group-box-visual">
+              <div className="group-label">Group {g + 1}</div>
+              <div className="group-items-row">
+                {Array.from({ length: itemsPerGroup }).map((_, item) => (
+                  <span key={item} className="item-icon">⭐</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Default fallback fraction visual bar
+  return (
+    <div className="q-visual-chart-container">
+      <div className="chart-title-tag">Visual Model</div>
+      <div className="fraction-bar-visual-flex">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className={`fraction-bar-slice ${i < 3 ? 'slice-shaded-pink' : 'slice-empty'}`}
+          >
+            1/4
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// IN-ROUND PRACTICE QUIZ VIEW
 function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld, onFinishRound, onBackToWorlds }) {
   const world = worldsData.find(w => w.id === worldId) || worldsData[0];
   const [questions, setQuestions] = useState(() => getRoundQuestions(world.id, 10));
@@ -114,7 +185,8 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [feedbackPopup, setFeedbackPopup] = useState(null);
-  const [summaryModal, setSummaryModal] = useState(null); // { passed: boolean, score: number, total: number }
+  const [showHint, setShowHint] = useState(false);
+  const [outOfHeartsModal, setOutOfHeartsModal] = useState(false);
 
   useEffect(() => {
     const qList = getRoundQuestions(world.id, 10);
@@ -123,7 +195,8 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
     setScore(0);
     setLives(3);
     setStreak(0);
-    setSummaryModal(null);
+    setShowHint(false);
+    setOutOfHeartsModal(false);
   }, [worldId]);
 
   const currentQ = questions[qIdx] || questions[0] || {
@@ -136,14 +209,15 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   };
 
   useEffect(() => {
-    if (currentQ && !summaryModal) {
+    if (currentQ && !outOfHeartsModal) {
       speakText(currentQ.narrationText || currentQ.stemText);
       setSelectedOption(null);
       setIsAnswered(false);
+      setShowHint(false);
     }
-  }, [qIdx, questions, summaryModal]);
+  }, [qIdx, questions, outOfHeartsModal]);
 
-  // REQUIREMENT: Auto-close feedback popup after 1 second (1000ms) and advance to next question
+  // REQUIREMENT: Auto-close 1-second feedback popup
   useEffect(() => {
     if (feedbackPopup) {
       const timer = setTimeout(() => {
@@ -155,7 +229,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   }, [feedbackPopup]);
 
   const handleSelectAnswer = (option) => {
-    if (isAnswered || summaryModal) return;
+    if (isAnswered || outOfHeartsModal) return;
     setSelectedOption(option);
     setIsAnswered(true);
 
@@ -177,61 +251,71 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
       setLives(newLives);
       setStreak(0);
 
-      setFeedbackPopup({
-        type: 'wrong',
-        message: `The correct answer is ${currentQ.correctAnswer}`
-      });
-      speakText(`Not quite! The correct answer is ${currentQ.correctAnswer}`);
+      if (newLives <= 0) {
+        // Out of hearts! Trigger attractive popup
+        setFeedbackPopup({
+          type: 'wrong',
+          message: `The correct answer is ${currentQ.correctAnswer}`
+        });
+        speakText("Out of hearts! Don't worry, practice makes perfect!");
+      } else {
+        setFeedbackPopup({
+          type: 'wrong',
+          message: `The correct answer is ${currentQ.correctAnswer}`
+        });
+        speakText(`Not quite! The correct answer is ${currentQ.correctAnswer}`);
+      }
     }
   };
 
   const handleAdvanceAfterPopup = () => {
-    if (lives <= 0 || qIdx >= questions.length - 1) {
-      triggerSummary(score);
+    if (lives <= 0) {
+      // Out of hearts popup
+      onUpdateProgress({
+        worldId: world.id,
+        score,
+        total: questions.length,
+        passed: score >= 4,
+        unlockedNext: score >= 4
+      });
+      setOutOfHeartsModal(true);
+    } else if (qIdx >= questions.length - 1) {
+      // Completed all 10 questions! Automatically update progress and switch to world list!
+      const passed = score >= 4;
+      onUpdateProgress({
+        worldId: world.id,
+        score,
+        total: questions.length,
+        passed,
+        unlockedNext: passed
+      });
+      speakText("World Complete! Switching to World List...");
+      setTimeout(() => {
+        onBackToWorlds();
+      }, 1200);
     } else {
       setQIdx(prev => prev + 1);
     }
   };
 
-  const triggerSummary = (finalScore) => {
-    const passed = finalScore >= 4; // Passing rule: at least 4 correct answers out of 10!
-    onUpdateProgress({
-      worldId: world.id,
-      score: finalScore,
-      total: questions.length,
-      passed,
-      unlockedNext: passed
-    });
-    setSummaryModal({
-      passed,
-      score: finalScore,
-      total: questions.length
-    });
-  };
-
-  const handleRetryCurrentWorld = () => {
+  const handleRetryWorld = () => {
     const qList = getRoundQuestions(world.id, 10);
     setQuestions(qList);
     setQIdx(0);
     setScore(0);
     setLives(3);
     setStreak(0);
-    setSummaryModal(null);
+    setShowHint(false);
+    setOutOfHeartsModal(false);
   };
 
-  const handleGoToNextWorld = () => {
-    const currentIdx = worldsData.findIndex(w => w.id === world.id);
-    const nextWorld = worldsData[currentIdx + 1];
-    if (nextWorld) {
-      onLaunchNextWorld(nextWorld.id);
-    } else {
-      onFinishRound({
-        worldId: world.id,
-        score,
-        total: questions.length,
-        passed: true
-      });
-    }
+  const getHintText = () => {
+    if (currentQ.explanation) return currentQ.explanation;
+    const text = currentQ.stemText || "";
+    if (text.includes("simplest form")) return "💡 Hint: Divide both top and bottom numbers by their largest common divisor!";
+    if (text.includes("equivalent")) return "💡 Hint: Multiply or divide both numerator and denominator by the same factor!";
+    if (text.includes("24 ÷ 3") || text.includes("3 × 8")) return "💡 Hint: Division is splitting into equal groups! 24 ÷ 3 gives 8.";
+    return "💡 Hint: Look at the visual fraction diagram above to count the shaded slices!";
   };
 
   const progressPct = Math.round(((qIdx + 1) / questions.length) * 100);
@@ -239,15 +323,27 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   return (
     <div className="play-phase-wrapper-ss">
       <div className="play-world-stage-ss">
-        {/* Top Pink World Badge matching SS */}
+        {/* Top Pink World Badge */}
         <div className="top-world-pink-pill-ss">
           <span className="world-emoji">{world.icon}</span>
           <span>{world.name}</span>
         </div>
 
-        {/* Stats Pill Row matching SS (⭐ Score & 🔥 Streak) */}
+        {/* REQUIREMENT 1: Stats Pill Row showing 3 Hearts, ⭐ Score & 🔥 Streak */}
         <div className="play-stats-bar-ss">
           <div className="stats-pill-row-ss">
+            {/* 3 Hearts Indicator */}
+            <div className="stat-pill-ss hearts-pill flex gap-1 items-center">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Heart
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < lives ? 'text-rose-500 fill-rose-500 animate-pulse' : 'text-gray-600'
+                  }`}
+                />
+              ))}
+            </div>
+
             <div className="stat-pill-ss star-pill">
               <Star className="w-4 h-4 text-amber-300 fill-amber-300 inline mr-1" />
               <span>{score}</span>
@@ -259,7 +355,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
             </div>
           </div>
 
-          {/* Progress Row (Question 1/10 & 0%) */}
+          {/* Progress Row (Question 1/10 & Progress %) */}
           <div className="progress-info-row-ss">
             <span>Question {qIdx + 1}/{questions.length}</span>
             <span>{progressPct}%</span>
@@ -273,7 +369,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
           </div>
         </div>
 
-        {/* Main Glassmorphism Question Card matching SS */}
+        {/* Main Glassmorphism Question Card */}
         <div className="play-main-card-ss">
           {/* Orange Concept Badge */}
           <div className="top-orange-badge-ss">
@@ -283,6 +379,9 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
 
           {/* Stem Text */}
           <h2 className="play-stem-title-ss">{currentQ.stemText}</h2>
+
+          {/* REQUIREMENT 4: Visual Diagram / Chart for Question */}
+          <QuestionVisualDiagram question={currentQ} />
 
           {/* 2x2 Answer Grid */}
           <div className="play-tiles-2x2-ss">
@@ -306,19 +405,36 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
             })}
           </div>
 
-          <div className="mt-3">
-            <button onClick={onBackToWorlds} className="play-exit-btn-ss">
-              <ArrowLeft className="w-3.5 h-3.5 inline mr-1" /> Exit World
+          {/* REQUIREMENT 5: Hint Button instead of Exit World Button */}
+          <div className="mt-3 flex flex-col items-center gap-2">
+            <button
+              onClick={() => {
+                const nextState = !showHint;
+                setShowHint(nextState);
+                if (nextState) speakText(getHintText());
+              }}
+              className="btn-hint-gold-pill"
+            >
+              <Lightbulb className="w-4 h-4 inline mr-1.5 text-amber-300 fill-amber-300" />
+              {showHint ? "Hide Hint 💡" : "Need a Hint? 💡"}
             </button>
+
+            {showHint && (
+              <div className="hint-display-box animate-fadeIn">
+                {getHintText()}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* 1-SECOND FEEDBACK POPUP */}
-      {feedbackPopup && !summaryModal && (
+      {feedbackPopup && !outOfHeartsModal && (
         <div className="feedback-modal-backdrop-ss" onClick={() => setFeedbackPopup(null)}>
           <div
-            className={`feedback-modal-card-ss ${feedbackPopup.type === 'correct' ? 'card-success-green' : 'card-error-red'}`}
+            className={`feedback-modal-card-ss ${
+              feedbackPopup.type === 'correct' ? 'card-success-green' : 'card-error-red'
+            }`}
             onClick={e => e.stopPropagation()}
           >
             <div className="modal-emoji-top">
@@ -334,44 +450,29 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
         </div>
       )}
 
-      {/* ROUND END SUMMARY / RETRY MODAL (NO BLANK SCREEN EVER!) */}
-      {summaryModal && (
+      {/* REQUIREMENT 3: ATTRACTIVE OUT OF HEARTS POPUP FOR GRADE 5 STUDENTS */}
+      {outOfHeartsModal && (
         <div className="feedback-modal-backdrop-ss">
-          <div className={`feedback-modal-card-ss ${summaryModal.passed ? 'card-success-green' : 'card-error-red'}`}>
-            <div className="modal-emoji-top">
-              {summaryModal.passed ? '🏆' : '💔'}
+          <div className="feedback-modal-card-ss card-error-red animate-bounceIn">
+            <div className="modal-emoji-top animate-pulse">
+              💔
             </div>
 
-            <h3 className="modal-title-ss">
-              {summaryModal.passed ? 'World Completed! 🎉' : 'Keep Trying!'}
+            <h3 className="modal-title-ss text-2xl font-black text-white">
+              Out of Hearts! 🥺
             </h3>
 
-            <p className="modal-message-ss">
-              {summaryModal.passed
-                ? `Awesome! You scored ${summaryModal.score} out of 10 and unlocked the next world!`
-                : `You scored ${summaryModal.score} out of 10. You need at least 4 correct answers to unlock the next world.`}
+            <p className="modal-message-ss text-amber-200 font-bold">
+              Don't worry, Super Math Explorer! Practice makes perfect! You earned {score} points. Let's try again! 🚀
             </p>
 
             <div className="flex gap-3 mt-4 w-full justify-center">
-              {summaryModal.passed ? (
-                <>
-                  <button onClick={onBackToWorlds} className="btn-sim-prev">
-                    <ArrowLeft className="w-4 h-4 mr-1" /> World Grid
-                  </button>
-                  <button onClick={handleGoToNextWorld} className="btn-sim-complete-gold">
-                    Next World <ArrowRight className="w-4 h-4 ml-1" />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button onClick={onBackToWorlds} className="btn-sim-prev">
-                    <ArrowLeft className="w-4 h-4 mr-1" /> World Grid
-                  </button>
-                  <button onClick={handleRetryCurrentWorld} className="btn-sim-complete-gold">
-                    Retry World <RefreshCw className="w-4 h-4 ml-1" />
-                  </button>
-                </>
-              )}
+              <button onClick={onBackToWorlds} className="btn-sim-prev">
+                <ArrowLeft className="w-4 h-4 mr-1" /> World Grid
+              </button>
+              <button onClick={handleRetryWorld} className="btn-sim-complete-gold">
+                Try Again 🔄
+              </button>
             </div>
           </div>
         </div>
