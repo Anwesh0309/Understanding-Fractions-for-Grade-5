@@ -28,6 +28,7 @@ const defaultProgress = {
 
 export default function App() {
   const [currentPhase, setCurrentPhase] = useState("wonder");
+  const [isIntroScreen, setIsIntroScreen] = useState(true);
   const [progress, setProgress] = useState(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -58,6 +59,7 @@ export default function App() {
   const handlePhaseAdvance = (fromPhaseId, toPhaseId) => {
     markPhaseComplete(fromPhaseId);
     setCurrentPhase(toPhaseId);
+    setIsIntroScreen(false);
   };
 
   const handleUpdateWorldProgress = ({ worldId, score, total, stars }) => {
@@ -82,6 +84,8 @@ export default function App() {
     });
   };
 
+  const showTopHeader = !(currentPhase === "wonder" && isIntroScreen);
+
   return (
     <div className="app-shell-viewport">
       {/* Background Floating Fraction Symbols */}
@@ -94,28 +98,42 @@ export default function App() {
         <span className="symbol sym-6">3/8</span>
       </div>
 
-      {/* Top Header with Segmented Phase Tracker & Audio Toggle */}
-      <header className="app-top-header">
-        <div className="header-brand-logo">
-          <span className="brand-icon">🍕</span>
-          <span className="brand-name">FractionVerse<span className="text-amber-300 ml-1">360</span></span>
-        </div>
+      {/* Top Header — Hidden during Intro Screen as requested */}
+      {showTopHeader && (
+        <header className="app-top-header">
+          <div className="header-brand-logo">
+            <span className="brand-icon">🍕</span>
+            <span className="brand-name">FractionVerse<span className="text-amber-300 ml-1">360</span></span>
+          </div>
 
-        <PhaseTracker
-          currentPhase={currentPhase}
-          completedPhases={progress.completedPhases}
-          onPhaseSelect={(phaseId) => setCurrentPhase(phaseId)}
-        />
+          <PhaseTracker
+            currentPhase={currentPhase}
+            completedPhases={progress.completedPhases}
+            onPhaseSelect={(phaseId) => {
+              setCurrentPhase(phaseId);
+              setIsIntroScreen(false);
+            }}
+          />
 
-        <div className="header-actions">
+          <div className="header-actions">
+            <AudioToggle />
+          </div>
+        </header>
+      )}
+
+      {/* Floating Audio Button top-right during Intro screen */}
+      {!showTopHeader && (
+        <div className="floating-intro-audio-btn">
           <AudioToggle />
         </div>
-      </header>
+      )}
 
       {/* Main Single-Frame Viewport Stage */}
       <main className="app-main-stage">
         {currentPhase === "wonder" && (
           <WonderPhase
+            isIntroScreen={isIntroScreen}
+            setIsIntroScreen={setIsIntroScreen}
             onComplete={() => handlePhaseAdvance("wonder", "story")}
           />
         )}

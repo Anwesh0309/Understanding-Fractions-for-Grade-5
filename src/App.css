@@ -1528,3 +1528,273 @@ body, html {
 @media print {
   .no-print { display: none !important; }
 }
+
+/* ==========================================================================
+   EXACT MATCH INTRO SCREEN STYLING (matching user screenshot)
+   ========================================================================== */
+.floating-intro-audio-btn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+}
+
+.wonder-hero-wrapper-ss {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.hero-ss-container {
+  max-width: 680px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.hero-top-badge-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+  padding: 4px 18px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hero-ss-main-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.title-part-orange {
+  color: #FF5722;
+  text-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+}
+
+.title-part-white {
+  color: #ffffff;
+}
+
+.title-part-yellow {
+  color: #FFC107;
+  text-shadow: 0 0 16px rgba(255, 193, 7, 0.5);
+}
+
+.hero-ss-subbrand {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  color: #FFC107;
+  letter-spacing: 0.5px;
+  margin-top: -4px;
+}
+
+.hero-ss-mascot-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: 340px;
+  margin: 4px 0;
+}
+
+.fox-avatar-circle-ss {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+  flex-shrink: 0;
+}
+
+.fox-emoji-ss {
+  font-size: 22px;
+}
+
+.speech-bubble-box-ss {
+  background: #ffffff;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  padding: 8px 14px;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.speech-text-ss {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  color: #120B2E;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.hero-ss-desc {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 520px;
+  line-height: 1.45;
+  margin-bottom: 2px;
+}
+
+.highlight-yellow {
+  color: #FFC107;
+  font-weight: 900;
+}
+
+.hero-ss-journey-card {
+  background: rgba(22, 14, 48, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 12px 20px;
+  width: 100%;
+  max-width: 520px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.journey-card-heading {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: #FFC107;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.journey-flow-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.journey-flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.journey-flow-row.center-row {
+  justify-content: center;
+}
+
+.journey-flow-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 5px 10px;
+  border-radius: 12px;
+}
+
+.item-icon-bg {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.item-labels {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.item-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.item-desc {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.flow-arrow {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 900;
+}
+
+.btn-ss-begin-journey {
+  background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+  padding: 12px 42px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  color: #120B2E;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+
+.btn-ss-begin-journey:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.7);
+}
+
+.hero-ss-bottom-tiles {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.ss-feature-tile {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.tile-icon {
+  font-size: 20px;
+}
+
+.tile-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
