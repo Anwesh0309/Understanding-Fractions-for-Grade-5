@@ -17,6 +17,16 @@ export function SimulatePhase({ onComplete }) {
     }
   }, [activeTab]);
 
+  // REQUIREMENT: Auto-close feedback popups after 3 seconds
+  useEffect(() => {
+    if (feedbackPopup) {
+      const timer = setTimeout(() => {
+        setFeedbackPopup(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedbackPopup]);
+
   const closeFeedback = () => {
     setFeedbackPopup(null);
   };
@@ -93,7 +103,7 @@ export function SimulatePhase({ onComplete }) {
         </div>
       </div>
 
-      {/* EXACT MATCH SCREENSHOT FEEDBACK POPUP MODAL */}
+      {/* EXACT MATCH SCREENSHOT FEEDBACK POPUP MODAL (3-sec auto close) */}
       {feedbackPopup && (
         <div className="feedback-modal-backdrop-ss" onClick={closeFeedback}>
           <div
@@ -295,7 +305,7 @@ function StationMatchIt({ setFeedbackPopup }) {
 }
 
 /* ==========================================
-   STATION C: FRACTION SLIDER (SUPER ATTRACTIVE FOR GRADE 5)
+   STATION C: FRACTION SLIDER (NEAT & SPACIOUS DESIGN)
    ========================================== */
 function StationFractionSlider({ setFeedbackPopup }) {
   const [numA, setNumA] = useState(1);
@@ -314,17 +324,17 @@ function StationFractionSlider({ setFeedbackPopup }) {
   };
 
   return (
-    <div className="station-content-layout">
+    <div className="station-content-layout compact-layout">
       {/* Controls & Interactive Fraction Bars Side */}
-      <div className="station-controls-side space-y-4">
-        {/* Fraction A Interactive Slider Card */}
+      <div className="station-controls-side space-y-2">
+        {/* Fraction A Card */}
         <div className="fraction-slider-card blue-theme">
           <div className="slider-card-header">
             <span className="label-badge-blue">Fraction A 🔷</span>
             <span className="fraction-value-tag">{numA} / {denA}</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <input
               type="range"
               min="1"
@@ -347,7 +357,7 @@ function StationFractionSlider({ setFeedbackPopup }) {
             </select>
           </div>
 
-          {/* Visual Fraction Bar A */}
+          {/* Visual Bar A */}
           <div className="visual-fraction-bar-row">
             {Array.from({ length: denA }).map((_, i) => (
               <div
@@ -360,14 +370,14 @@ function StationFractionSlider({ setFeedbackPopup }) {
           </div>
         </div>
 
-        {/* Fraction B Interactive Slider Card */}
+        {/* Fraction B Card */}
         <div className="fraction-slider-card pink-theme">
           <div className="slider-card-header">
             <span className="label-badge-pink">Fraction B 🌸</span>
             <span className="fraction-value-tag">{numB} / {denB}</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <input
               type="range"
               min="1"
@@ -390,7 +400,7 @@ function StationFractionSlider({ setFeedbackPopup }) {
             </select>
           </div>
 
-          {/* Visual Fraction Bar B */}
+          {/* Visual Bar B */}
           <div className="visual-fraction-bar-row">
             {Array.from({ length: denB }).map((_, i) => (
               <div
@@ -403,7 +413,7 @@ function StationFractionSlider({ setFeedbackPopup }) {
           </div>
         </div>
 
-        <button onClick={handleVerifyAddition} className="btn-action-test mt-2">
+        <button onClick={handleVerifyAddition} className="btn-action-test py-2">
           ✨ Calculate & Verify Addition
         </button>
       </div>
@@ -412,7 +422,7 @@ function StationFractionSlider({ setFeedbackPopup }) {
       <div className="station-display-side">
         <div className="worked-solution-card-attractive">
           <div className="worked-header-pill">
-            <Sparkles className="w-4 h-4 text-amber-300 inline mr-1.5" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 inline mr-1" />
             Live Fractional Addition Visualizer
           </div>
 
@@ -424,21 +434,21 @@ function StationFractionSlider({ setFeedbackPopup }) {
             <span className="eq-result text-amber-300">{result.simplifiedNum}/{result.simplifiedDen}</span>
           </div>
 
-          <div className="worked-steps-list space-y-2 text-left w-full mt-3">
+          <div className="worked-steps-list space-y-1.5 text-left w-full">
             <div className="step-badge-row">
-              <span className="step-num">Step 1:</span> Find Common Denominator (LCD) = <strong>{result.commonDen}</strong>
+              <span className="step-num">Step 1:</span> Common LCD = <strong>{result.commonDen}</strong>
             </div>
 
             <div className="step-badge-row">
-              <span className="step-num">Step 2:</span> Convert Fractions ➔
+              <span className="step-num">Step 2:</span> Convert ➔
               <span className="text-cyan-300 font-bold ml-1">{result.num1}/{result.commonDen}</span> +
               <span className="text-pink-300 font-bold ml-1">{result.num2}/{result.commonDen}</span>
             </div>
 
-            {/* Combined Common Parts Visual Bar */}
-            <div className="combined-lcd-visual-box mt-3">
+            {/* Combined LCD Visual Bar */}
+            <div className="combined-lcd-visual-box">
               <div className="text-xs font-bold text-gray-300 mb-1 text-center">
-                Combined Grid ({result.commonDen} equal parts):
+                Combined Grid ({result.commonDen} parts):
               </div>
               <div className="combined-grid-bar">
                 {Array.from({ length: result.commonDen }).map((_, i) => {
@@ -457,8 +467,8 @@ function StationFractionSlider({ setFeedbackPopup }) {
             </div>
 
             <div className="step-badge-row final-result-highlight">
-              <span className="step-num">Result:</span> Total = <strong>{result.rawNum}/{result.commonDen}</strong> = <span className="text-amber-300 font-extrabold text-lg">{result.simplifiedNum}/{result.simplifiedDen}</span>
-              {result.mixed.whole > 0 && <span className="ml-2 text-emerald-300">({result.mixed.whole} {result.mixed.num}/{result.mixed.den})</span>}
+              <span className="step-num">Result:</span> Total = <strong>{result.rawNum}/{result.commonDen}</strong> = <span className="text-amber-300 font-extrabold text-base">{result.simplifiedNum}/{result.simplifiedDen}</span>
+              {result.mixed.whole > 0 && <span className="ml-1.5 text-emerald-300">({result.mixed.whole} {result.mixed.num}/{result.mixed.den})</span>}
             </div>
           </div>
         </div>
