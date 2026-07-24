@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { worldsData } from '../../data/worlds';
 import { getRoundQuestions } from '../../data/questionBank';
-import { speakText } from '../../utils/audio';
+import { speakText, stopNarration } from '../../utils/audio';
 import { Flame, Star, Lock, Sparkles, RefreshCw, ArrowRight, Heart, Lightbulb, ArrowLeft } from 'lucide-react';
 
 export function PlayPhase({ progress, onUpdateProgress, onComplete }) {

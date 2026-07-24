@@ -7,6 +7,7 @@ import { SimulatePhase } from './components/phases/SimulatePhase';
 import { PlayPhase } from './components/phases/PlayPhase';
 import { ReflectPhase } from './components/phases/ReflectPhase';
 import { worldsData } from './data/worlds';
+import { stopNarration } from './utils/audio';
 import './App.css';
 
 // Safety Error Boundary to completely prevent blank screen
@@ -72,6 +73,11 @@ export default function App() {
       console.warn("Storage clear error:", e);
     }
   }, []);
+
+  // STOP NARRATION IMMEDIATELY WHEN PHASE OR INTRO SCREEN CHANGES
+  useEffect(() => {
+    stopNarration();
+  }, [currentPhase, isIntroScreen]);
 
   const markPhaseComplete = (phaseId) => {
     setProgress(prev => ({

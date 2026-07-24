@@ -1536,9 +1536,32 @@ body, html {
    ========================================================================== */
 .floating-intro-audio-btn {
   position: absolute;
-  top: 20px;
+  top: 24px;
   right: 24px;
-  z-index: 100;
+  z-index: 50;
+}
+
+.audio-toggle-btn {
+  background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%) !important;
+  border: 1.5px solid #FFFFFF !important;
+  border-radius: 50px !important;
+  padding: 8px 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.6) !important;
+  transition: all 0.2s ease !important;
+}
+
+.audio-toggle-btn:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.8) !important;
+}
+
+.audio-toggle-btn.muted {
+  background: linear-gradient(135deg, #FFC107 0%, #E65100 100%) !important;
+  opacity: 0.85 !important;
 }
 
 .wonder-hero-wrapper-ss {
