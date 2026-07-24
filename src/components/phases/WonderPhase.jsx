@@ -27,7 +27,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
         <div className="hero-ss-container">
           {/* Top Pill Badge */}
           <div className="hero-top-badge-pill">
-            <span className="badge-sparkle-yellow">✨</span>{' '}
+            <span className="badge-sparkle-yellow">✨ </span>{' '}
             <span className="badge-grade-light-yellow">Grade 5</span>{' '}
             <span className="badge-dot-white">·</span>{' '}
             <span className="badge-adventure-white">Fractions Adventure</span>
