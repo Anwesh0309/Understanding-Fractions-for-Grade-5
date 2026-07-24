@@ -56,10 +56,17 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
             <div className="fox-avatar-circle-ss">
               <span className="fox-emoji-ss">🦊</span>
             </div>
-            <div className="speech-bubble-box-ss">
+            <div className="speech-bubble-box-ss flex items-center justify-between gap-3">
               <p className="speech-text-ss">
                 Hi! I'm Figgy. Ready to slice into fractions? 🍕
               </p>
+              <button
+                onClick={() => speakText("Hi! I'm Figgy. Ready to slice into fractions? Learn to split numbers into equal parts, connect fractions to division, and master equivalent fractions!")}
+                className="px-3 py-1 bg-amber-400 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+                title="Listen to Narration"
+              >
+                🔊 Listen
+              </button>
             </div>
           </div>
 
@@ -182,7 +189,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
         {/* Central Glassmorphism Card */}
         <div className="wonder-puzzle-main-card">
           <div className="puzzle-top-icon font-bold">🍕</div>
-          
+
           <h2 className="wonder-puzzle-question-text">
             {wonderData.puzzleCard.questionText}
           </h2>
