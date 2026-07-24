@@ -1280,23 +1280,38 @@ export const rawQuestionBank = [
   }
 ];
 
-export function getRoundQuestions(worldId, count = 8) {
-  const worldTemplates = rawQuestionBank.filter(q => q.worldId === worldId);
-  const selectedTemplates = shuffle(worldTemplates, Date.now()).slice(0, count);
+export function getRoundQuestions(worldId, count = 10) {
+  let worldTemplates = rawQuestionBank.filter(q => q.worldId === worldId);
+  if (worldTemplates.length === 0) {
+    worldTemplates = rawQuestionBank;
+  }
+
+  let pool = [...worldTemplates];
+  while (pool.length < count) {
+    pool = pool.concat(worldTemplates);
+  }
+
+  const selectedTemplates = shuffle(pool, Date.now() + Math.floor(Math.random() * 1000)).slice(0, count);
 
   return selectedTemplates.map((template, idx) => {
-    const seed = Date.now() + idx * 77;
-    const generated = template.generate(seed);
+    const seed = Date.now() + idx * 77 + Math.floor(Math.random() * 500);
+    const generated = template.generate ? template.generate(seed) : {
+      stemText: template.stemText || "Fraction Question",
+      correctAnswer: template.correctAnswer || "1/2",
+      distractors: template.distractors || ["1/3", "2/3", "3/4"],
+      narrationText: template.narrationText || "Fraction Question"
+    };
+
     const options = shuffle([generated.correctAnswer, ...generated.distractors], seed + 99);
     return {
-      id: template.id,
+      id: `${template.id}-${idx}`,
       worldId: template.worldId,
       subtopic: template.subtopic,
       conceptTitle: template.conceptTitle,
       stemText: generated.stemText,
       correctAnswer: generated.correctAnswer,
       options,
-      narrationText: generated.narrationText
+      narrationText: generated.narrationText || generated.stemText
     };
   });
 }

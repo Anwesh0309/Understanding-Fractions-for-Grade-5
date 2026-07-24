@@ -11,11 +11,10 @@ import './App.css';
 const LOCAL_STORAGE_KEY = "fractionverse_360_progress";
 
 const defaultProgress = {
-  xp: 150,
-  maxStreak: 5,
+  xp: 0,
+  maxStreak: 0,
   worlds: {
-    "pizza-piazza": { attempts: 1, bestScore: 8, stars: 3, unlocked: true },
-    "ribbon-row": { attempts: 0, bestScore: 0, stars: 0, unlocked: true }
+    "pizza-piazza": { attempts: 0, bestScore: 0, completed: false, unlocked: true }
   },
   completedPhases: {
     wonder: false,

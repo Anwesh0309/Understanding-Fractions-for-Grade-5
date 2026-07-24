@@ -42,10 +42,10 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
         {worldsData.map((world, idx) => {
           const worldState = progress?.worlds?.[world.id] || {};
 
-          // World 1 (idx 0) is unlocked. World N is unlocked ONLY if World N-1 has been completed
+          // World 1 (idx 0) is unlocked. World N is unlocked ONLY if World N-1 has completed === true!
           const prevWorldId = idx > 0 ? worldsData[idx - 1].id : null;
           const prevWorldState = prevWorldId ? progress?.worlds?.[prevWorldId] : null;
-          const isUnlocked = idx === 0 || prevWorldState?.completed || worldState.unlocked;
+          const isUnlocked = idx === 0 || (prevWorldState && prevWorldState.completed === true);
 
           const questionRangeStart = idx * 10 + 1;
           const questionRangeEnd = (idx + 1) * 10;
@@ -96,7 +96,7 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
 // IN-ROUND PRACTICE QUIZ VIEW (10 Qs, 3 Hearts, 4+ Passing rule, 1-sec simulation popups)
 function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
   const world = worldsData.find(w => w.id === worldId);
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState(() => getRoundQuestions(worldId, 10));
   const [qIdx, setQIdx] = useState(0);
   const [lives, setLives] = useState(3);
   const [streak, setStreak] = useState(0);
@@ -106,9 +106,8 @@ function PlayRoundView({ worldId, onFinishRound, onBackToWorlds }) {
   const [feedbackPopup, setFeedbackPopup] = useState(null); // simulation popup format
 
   useEffect(() => {
-    // 10 Questions per world round
-    const roundQ = getRoundQuestions(worldId, 10);
-    setQuestions(roundQ);
+    // Refresh questions when worldId changes
+    setQuestions(getRoundQuestions(worldId, 10));
   }, [worldId]);
 
   const currentQ = questions[qIdx];
