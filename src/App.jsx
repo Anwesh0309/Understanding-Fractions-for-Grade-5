@@ -101,9 +101,16 @@ export default function App() {
       {/* Top Header — Hidden during Intro Screen as requested */}
       {showTopHeader && (
         <header className="app-top-header">
-          <div className="header-brand-logo">
-            <span className="brand-icon">🍕</span>
-            <span className="brand-name">FractionVerse<span className="text-amber-300 ml-1">360</span></span>
+          <div className="header-left-slot">
+            <button
+              onClick={() => {
+                setCurrentPhase("wonder");
+                setIsIntroScreen(true);
+              }}
+              className="header-home-btn"
+            >
+              🏠 Home
+            </button>
           </div>
 
           <PhaseTracker

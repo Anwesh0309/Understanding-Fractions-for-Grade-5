@@ -153,47 +153,58 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
     );
   }
 
-  // WONDER PUZZLE CARD VIEW
+  // WONDER PUZZLE CARD VIEW (EXACT MATCH TO MODULE SCREENSHOT)
   return (
-    <div className="wonder-phase-container">
-      <div className="wonder-card-box">
-        <div className="mascot-speech-row">
-          <div className="fox-avatar-circle">🦊</div>
-          <div className="speech-bubble-box">
-            <p className="speech-text">{wonderData.puzzleCard.mascotComment}</p>
+    <div className="wonder-phase-container-ss">
+      <div className="wonder-puzzle-stage-ss">
+        {/* Giant Question Mark Circle Badge */}
+        <div className="giant-question-circle-purple">
+          ?
+        </div>
+
+        {/* Mascot Speech Bubble Row */}
+        <div className="hero-ss-mascot-row mt-3 mb-4">
+          <div className="fox-avatar-circle-ss">
+            <span className="fox-emoji-ss">🦊</span>
+          </div>
+          <div className="speech-bubble-box-ss">
+            <p className="speech-text-ss">{wonderData.puzzleCard.mascotComment || "Hmm... I wonder... 🤔"}</p>
           </div>
         </div>
 
-        <div className="wonder-puzzle-content">
-          <div className="wonder-icon-badge">🔍</div>
-          <h2 className="wonder-puzzle-question">
+        {/* Central Glassmorphism Card */}
+        <div className="wonder-puzzle-main-card">
+          <div className="puzzle-top-icon font-bold">🍕</div>
+          
+          <h2 className="wonder-puzzle-question-text">
             {wonderData.puzzleCard.questionText}
           </h2>
-          <p className="wonder-hint-italic">
+
+          <p className="wonder-puzzle-subtext-italic">
             {wonderData.puzzleCard.hintItalic}
           </p>
 
           {showTeaser ? (
-            <div className="wonder-teaser-revelation animate-fade-in">
-              <Lightbulb className="w-5 h-5 text-amber-300 inline mr-2" />
+            <div className="wonder-teaser-revelation-ss animate-fade-in mt-3">
+              <Lightbulb className="w-4 h-4 text-amber-300 inline mr-1.5" />
               {wonderData.puzzleCard.teaserPill}
             </div>
           ) : (
             <button
               onClick={() => setShowTeaser(true)}
-              className="wonder-hint-pill-btn"
+              className="wonder-hint-trigger-pill mt-3"
             >
               💡 Tap for a Hint!
             </button>
           )}
         </div>
 
+        {/* Primary Discover Button below card */}
         <button
           onClick={onComplete}
-          className="btn-investigate-gold"
+          className="btn-discover-purple-ss"
         >
-          {wonderData.puzzleCard.investigateBtnText}
-          <ArrowRight className="w-5 h-5 ml-1" />
+          ✨ Let's Investigate! ✨
         </button>
       </div>
     </div>
