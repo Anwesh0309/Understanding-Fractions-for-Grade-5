@@ -1530,7 +1530,7 @@ body, html {
 }
 
 /* ==========================================================================
-   EXACT MATCH INTRO SCREEN STYLING (matching user screenshot)
+   EXACT MATCH INTRO SCREEN STYLING (high-contrast bold typography)
    ========================================================================== */
 .floating-intro-audio-btn {
   position: absolute;
@@ -1545,12 +1545,12 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 12px;
 }
 
 .hero-ss-container {
-  max-width: 680px;
+  max-width: 720px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -1560,126 +1560,131 @@ body, html {
 }
 
 .hero-top-badge-pill {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 50px;
-  padding: 4px 18px;
-  font-size: 12px;
-  font-weight: 800;
+  padding: 5px 22px;
+  font-size: 13px;
+  font-weight: 900;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .hero-ss-main-title {
   font-family: 'Fredoka', sans-serif;
-  font-size: 42px;
+  font-size: 46px;
   font-weight: 900;
   line-height: 1.1;
   margin-top: 2px;
+  letter-spacing: -0.5px;
 }
 
 .title-part-orange {
   color: #FF5722;
-  text-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+  text-shadow: 0 3px 12px rgba(255, 87, 34, 0.4);
 }
 
 .title-part-white {
   color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .title-part-yellow {
   color: #FFC107;
-  text-shadow: 0 0 16px rgba(255, 193, 7, 0.5);
+  text-shadow: 0 0 20px rgba(255, 193, 7, 0.6);
 }
 
 .hero-ss-subbrand {
   font-family: 'Fredoka', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   color: #FFC107;
-  letter-spacing: 0.5px;
-  margin-top: -4px;
+  letter-spacing: 1px;
+  margin-top: -6px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .hero-ss-mascot-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  max-width: 340px;
+  gap: 12px;
+  max-width: 360px;
   margin: 4px 0;
 }
 
 .fox-avatar-circle-ss {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
   border: 2px solid #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+  box-shadow: 0 4px 14px rgba(255, 193, 7, 0.5);
   flex-shrink: 0;
 }
 
 .fox-emoji-ss {
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .speech-bubble-box-ss {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 18px;
   border-bottom-left-radius: 4px;
-  padding: 8px 14px;
+  padding: 10px 16px;
   text-align: left;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .speech-text-ss {
   font-family: 'Fredoka', sans-serif;
-  font-weight: 800;
-  font-size: 12px;
+  font-weight: 900;
+  font-size: 13px;
   color: #120B2E;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .hero-ss-desc {
   font-family: 'Fredoka', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
-  max-width: 520px;
-  line-height: 1.45;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 560px;
+  line-height: 1.5;
   margin-bottom: 2px;
 }
 
 .highlight-yellow {
   color: #FFC107;
   font-weight: 900;
+  text-shadow: 0 0 8px rgba(255, 193, 7, 0.3);
 }
 
 .hero-ss-journey-card {
-  background: rgba(22, 14, 48, 0.7);
-  border: 1.5px solid rgba(255, 255, 255, 0.14);
-  border-radius: 20px;
-  padding: 12px 20px;
+  background: rgba(22, 14, 48, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 22px;
+  padding: 14px 24px;
   width: 100%;
-  max-width: 520px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 560px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4);
 }
 
 .journey-card-heading {
   font-family: 'Fredoka', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   color: #FFC107;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
@@ -1703,21 +1708,22 @@ body, html {
 .journey-flow-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 5px 10px;
-  border-radius: 12px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .item-icon-bg {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.16);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .item-labels {
@@ -1728,73 +1734,75 @@ body, html {
 
 .item-title {
   font-family: 'Fredoka', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   color: #ffffff;
 }
 
 .item-desc {
-  font-size: 8px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
   white-space: nowrap;
 }
 
 .flow-arrow {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 900;
 }
 
 .btn-ss-begin-journey {
   background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
-  border: 2px solid #ffffff;
+  border: 2.5px solid #ffffff;
   border-radius: 50px;
-  padding: 12px 42px;
+  padding: 14px 48px;
   font-family: 'Fredoka', sans-serif;
   font-weight: 900;
-  font-size: 16px;
+  font-size: 18px;
   color: #120B2E;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.6);
   transition: all 0.2s ease;
   margin-top: 4px;
 }
 
 .btn-ss-begin-journey:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.7);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(255, 152, 0, 0.8);
 }
 
 .hero-ss-bottom-tiles {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  max-width: 440px;
+  max-width: 480px;
   justify-content: center;
   margin-top: 4px;
 }
 
 .ss-feature-tile {
   flex: 1;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 
 .tile-icon {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .tile-title {
   font-family: 'Fredoka', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   color: #ffffff;
 }
+
 
