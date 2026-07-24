@@ -392,6 +392,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
                 else if (opt === selectedOption) tileClass += " wrong";
               }
 
+              const optText = String(opt !== undefined && opt !== null ? opt : "2/3").trim();
               return (
                 <button
                   key={i}
@@ -399,8 +400,8 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
                   onClick={() => handleSelectAnswer(opt)}
                   className={tileClass}
                 >
-                  <span className="text-amber-300 font-bold mr-2 inline-block">{String.fromCharCode(65 + i)}.</span>
-                  <span>{opt}</span>
+                  <span className="text-amber-300 font-extrabold mr-2 inline-block">{String.fromCharCode(65 + i)}.</span>
+                  <span className="font-extrabold text-white">{optText}</span>
                 </button>
               );
             })}

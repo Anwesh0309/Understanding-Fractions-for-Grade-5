@@ -1281,27 +1281,35 @@ export const rawQuestionBank = [
 ];
 
 function buildFourOptions(correctAnswer, distractors = [], seed = 1) {
-  const cleanCorrect = String(correctAnswer !== undefined && correctAnswer !== null ? correctAnswer : "1/2").trim();
+  const cleanCorrect = (correctAnswer !== undefined && correctAnswer !== null && String(correctAnswer).trim() !== "" && String(correctAnswer).trim() !== "[object Object]")
+    ? String(correctAnswer).trim()
+    : "2/3";
+
   const cleanSet = new Set([cleanCorrect]);
 
   (distractors || []).forEach(d => {
     if (d !== undefined && d !== null) {
       const str = String(d).trim();
-      if (str.length > 0) {
+      if (str.length > 0 && str !== "[object Object]" && str !== "undefined" && str !== "null") {
         cleanSet.add(str);
       }
     }
   });
 
-  let fillCount = 1;
+  const pool = ["1/2", "2/3", "3/4", "4/5", "5/6", "3/8", "5/8", "7/12", "1/4", "3/5", "7/10", "1/6", "5/12"];
+  let pIdx = 0;
+  while (cleanSet.size < 4 && pIdx < pool.length) {
+    if (!cleanSet.has(pool[pIdx])) {
+      cleanSet.add(pool[pIdx]);
+    }
+    pIdx++;
+  }
+
+  let count = 1;
   while (cleanSet.size < 4) {
-    const f1 = `${fillCount}/${fillCount + 2}`;
-    const f2 = `${fillCount + 1}/${fillCount + 3}`;
-    const f3 = `${fillCount + 2}/${fillCount + 4}`;
-    if (!cleanSet.has(f1)) cleanSet.add(f1);
-    else if (!cleanSet.has(f2)) cleanSet.add(f2);
-    else cleanSet.add(f3);
-    fillCount++;
+    const f = `${count}/${count + 4}`;
+    cleanSet.add(f);
+    count++;
   }
 
   const rawArray = Array.from(cleanSet).slice(0, 4);

@@ -17,7 +17,9 @@ export function StoryPhase({ onComplete }) {
 
   const handleNext = () => {
     if (currentIdx < storyCards.length - 1) {
-      setCurrentIdx(prev => prev + 1);
+      const nextIdx = currentIdx + 1;
+      setCurrentIdx(nextIdx);
+      speakText(storyCards[nextIdx].narration);
     } else {
       onComplete();
     }
@@ -25,7 +27,9 @@ export function StoryPhase({ onComplete }) {
 
   const handleBack = () => {
     if (currentIdx > 0) {
-      setCurrentIdx(prev => prev - 1);
+      const nextIdx = currentIdx - 1;
+      setCurrentIdx(nextIdx);
+      speakText(storyCards[nextIdx].narration);
     }
   };
 

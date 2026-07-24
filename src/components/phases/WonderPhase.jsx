@@ -21,6 +21,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
 
   const handleBeginJourney = () => {
     setShowPuzzle(true);
+    speakText(wonderData.puzzleCard.narration);
     if (setIsIntroScreen) {
       setIsIntroScreen(false);
     }
