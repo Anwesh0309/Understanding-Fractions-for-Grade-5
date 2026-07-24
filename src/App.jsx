@@ -44,7 +44,7 @@ class ErrorBoundary extends Component {
 
 const LOCAL_STORAGE_KEY = "fractionverse_360_progress";
 
-const defaultProgress = {
+const getFreshDefaultProgress = () => ({
   xp: 0,
   maxStreak: 0,
   worlds: {
@@ -57,27 +57,21 @@ const defaultProgress = {
     play: false,
     reflect: false
   }
-};
+});
 
 export default function App() {
   const [currentPhase, setCurrentPhase] = useState("wonder");
   const [isIntroScreen, setIsIntroScreen] = useState(true);
-  const [progress, setProgress] = useState(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : defaultProgress;
-    } catch (e) {
-      return defaultProgress;
-    }
-  });
+  const [progress, setProgress] = useState(getFreshDefaultProgress);
 
+  // ALWAYS RESET PROGRESS WHEN USER ENTERS MODULE
   useEffect(() => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progress));
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
     } catch (e) {
-      console.warn("Storage save error:", e);
+      console.warn("Storage clear error:", e);
     }
-  }, [progress]);
+  }, []);
 
   const markPhaseComplete = (phaseId) => {
     setProgress(prev => ({
@@ -149,6 +143,7 @@ export default function App() {
           <div className="header-left-slot">
             <button
               onClick={() => {
+                setProgress(getFreshDefaultProgress());
                 setCurrentPhase("wonder");
                 setIsIntroScreen(true);
               }}
