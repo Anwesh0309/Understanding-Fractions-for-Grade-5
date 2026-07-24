@@ -28,7 +28,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
           {/* Top Pill Badge */}
           <div className="hero-top-badge-pill">
             <Sparkles className="w-3.5 h-3.5 text-amber-300 inline mr-1.5" />
-            Singapore MOE Curriculum · Grade 5
+            Grade 5 · Fractions Adventure
           </div>
 
           {/* Main Title: Division as Grouping -> Understanding as Fractions */}
