@@ -2,7 +2,7 @@
  * Audio Engine for FractionVerse 360
  * Integrates ElevenLabs TTS with Web Speech API fallback.
  * Guarantees ZERO audio overlap using activeSpeechId tokens.
- * Unlocks Web Speech API audio context on first user interaction.
+ * Automatically queues and plays pending narration upon initial user interaction.
  */
 
 const ELEVEN_LABS_VOICE_ID = import.meta.env.VITE_ELEVENLABS_VOICE_ID || "Xb7hH8MSUJpSbSDYk0k2";
@@ -13,25 +13,37 @@ let currentAudio = null;
 let currentUtterance = null;
 let activeSpeechId = 0;
 let audioUnlocked = false;
+let pendingSpeechText = null;
+let pendingSpeechOptions = null;
 const audioCache = new Map();
 
-// Unlock browser speech audio context on first click/touch
+// Unlock browser speech audio context on first click/touch and play queued narration
 function unlockAudio() {
-  if (audioUnlocked) return;
-  audioUnlocked = true;
-  if (window.speechSynthesis) {
-    try {
-      const dummy = new SpeechSynthesisUtterance("");
-      dummy.volume = 0;
-      window.speechSynthesis.speak(dummy);
-    } catch(e) {}
+  if (!audioUnlocked) {
+    audioUnlocked = true;
+    if (window.speechSynthesis) {
+      try {
+        const dummy = new SpeechSynthesisUtterance("");
+        dummy.volume = 0;
+        window.speechSynthesis.speak(dummy);
+      } catch (e) {}
+    }
+  }
+
+  if (pendingSpeechText && !isMuted) {
+    const textToPlay = pendingSpeechText;
+    const optionsToPlay = pendingSpeechOptions;
+    pendingSpeechText = null;
+    pendingSpeechOptions = null;
+    speakText(textToPlay, optionsToPlay);
   }
 }
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('click', unlockAudio, { once: true });
-  window.addEventListener('touchstart', unlockAudio, { once: true });
-  window.addEventListener('keydown', unlockAudio, { once: true });
+  window.addEventListener('click', unlockAudio);
+  window.addEventListener('touchstart', unlockAudio);
+  window.addEventListener('keydown', unlockAudio);
+  window.addEventListener('pointerdown', unlockAudio);
 }
 
 export function toggleMute(mutedState) {
@@ -48,6 +60,9 @@ export function getMuteState() {
 
 export function stopNarration() {
   activeSpeechId++; // Invalidate all pending async audio fetches!
+  pendingSpeechText = null;
+  pendingSpeechOptions = null;
+
   if (currentAudio) {
     try {
       currentAudio.pause();
@@ -65,7 +80,6 @@ export function stopNarration() {
 }
 
 export async function speakText(text, options = {}) {
-  unlockAudio();
   if (isMuted || !text) return;
 
   stopNarration();
@@ -104,7 +118,7 @@ export async function speakText(text, options = {}) {
       if (audioCache.has(spokenText)) {
         const cachedUrl = audioCache.get(spokenText);
         if (thisSpeechId === activeSpeechId) {
-          playAudioUrl(cachedUrl, thisSpeechId, options);
+          playAudioUrl(cachedUrl, thisSpeechId, spokenText, options);
         }
         return;
       }
@@ -136,7 +150,7 @@ export async function speakText(text, options = {}) {
 
         const audioUrl = URL.createObjectURL(blob);
         audioCache.set(spokenText, audioUrl);
-        playAudioUrl(audioUrl, thisSpeechId, options);
+        playAudioUrl(audioUrl, thisSpeechId, spokenText, options);
         return;
       }
     } catch (err) {
@@ -150,7 +164,7 @@ export async function speakText(text, options = {}) {
   }
 }
 
-function playAudioUrl(url, speechId, options = {}) {
+function playAudioUrl(url, speechId, rawText, options = {}) {
   if (speechId !== activeSpeechId) return;
 
   if (currentAudio) {
@@ -175,7 +189,9 @@ function playAudioUrl(url, speechId, options = {}) {
   };
 
   audio.play().catch(e => {
-    console.warn("Audio play blocked or failed:", e);
+    console.warn("Audio play blocked by browser autoplay policy, queuing for first gesture:", e);
+    pendingSpeechText = rawText;
+    pendingSpeechOptions = options;
   });
 }
 
@@ -200,5 +216,10 @@ function speakWebSpeech(text, speechId, options = {}) {
   };
 
   currentUtterance = utterance;
-  window.speechSynthesis.speak(utterance);
+  try {
+    window.speechSynthesis.speak(utterance);
+  } catch(e) {
+    pendingSpeechText = text;
+    pendingSpeechOptions = options;
+  }
 }
