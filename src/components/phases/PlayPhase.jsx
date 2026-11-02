@@ -384,10 +384,22 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
 
         {/* Main Glassmorphism Question Card */}
         <div className="play-main-card-ss">
-          {/* Orange Concept Badge */}
-          <div className="top-orange-badge-ss">
-            <Sparkles className="w-3.5 h-3.5 inline mr-1" />
-            {currentQ.conceptTitle || "DIVISION GROUPING"}
+          <div className="flex items-center justify-between gap-2 mb-2 w-full">
+            {/* Orange Concept Badge */}
+            <div className="top-orange-badge-ss">
+              <Sparkles className="w-3.5 h-3.5 inline mr-1" />
+              {currentQ.conceptTitle || "DIVISION GROUPING"}
+            </div>
+            <button
+              onClick={() => {
+                unlockAudio();
+                speakText(currentQ.narrationText || currentQ.stemText, { audioUrl: currentQ.audioUrl });
+              }}
+              className="px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+              title="Listen to Question"
+            >
+              🔊 Listen
+            </button>
           </div>
 
           {/* Stem Text */}
@@ -427,6 +439,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
                 const nextState = !showHint;
                 setShowHint(nextState);
                 if (nextState) {
+                  unlockAudio();
                   speakText(getHintText(), { audioUrl: currentQ.hintAudioUrl });
                 } else {
                   stopNarration();

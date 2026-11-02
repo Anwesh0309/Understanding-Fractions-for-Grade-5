@@ -18,21 +18,19 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
   }, [isIntroScreen]);
 
   useEffect(() => {
-    stopNarration();
     if (showPuzzle) {
       speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
-    } else {
-      speakText("Welcome to Grade 5 Fractions Adventure! Ready to slice into fractions with Figgy?", { audioUrl: "/audio/wonder/wonder_intro.mp3" });
     }
   }, [showPuzzle]);
 
   const handleBeginJourney = () => {
     unlockAudio();
     stopNarration();
-    setShowPuzzle(true);
     if (setIsIntroScreen) {
       setIsIntroScreen(false);
     }
+    setShowPuzzle(true);
+    speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
   };
 
   if (!showPuzzle) {
@@ -69,9 +67,12 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
                 Hi! I'm Figgy. Ready to slice into fractions? 🍕
               </p>
               <button
-                onClick={() => speakText("Hi! I'm Figgy. Ready to slice into fractions? Learn to split numbers into equal parts, connect fractions to division, and master equivalent fractions!", { audioUrl: "/audio/wonder/wonder_mascot.mp3" })}
+                onClick={() => {
+                  unlockAudio();
+                  speakText("Hi! I'm Figgy. Ready to slice into fractions? Learn to split numbers into equal parts, connect fractions to division, and master equivalent fractions!", { audioUrl: "/audio/wonder/wonder_mascot.mp3" });
+                }}
                 className="px-3 py-1 bg-amber-400 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
-                title="Listen to Narration"
+                title="Listen to Figgy"
               >
                 🔊 Listen
               </button>
@@ -189,14 +190,36 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
           <div className="fox-avatar-circle-ss">
             <span className="fox-emoji-ss">🦊</span>
           </div>
-          <div className="speech-bubble-box-ss">
+          <div className="speech-bubble-box-ss flex items-center justify-between gap-3">
             <p className="speech-text-ss">{wonderData.puzzleCard.mascotComment || "Hmm... I wonder... 🤔"}</p>
+            <button
+              onClick={() => {
+                unlockAudio();
+                speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
+              }}
+              className="px-3 py-1 bg-amber-400 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+              title="Listen to Puzzle"
+            >
+              🔊 Listen
+            </button>
           </div>
         </div>
 
         {/* Central Glassmorphism Card */}
         <div className="wonder-puzzle-main-card">
-          <div className="puzzle-top-icon font-bold">🍕</div>
+          <div className="flex items-center justify-between gap-2 mb-2 w-full">
+            <div className="puzzle-top-icon font-bold">🍕</div>
+            <button
+              onClick={() => {
+                unlockAudio();
+                speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
+              }}
+              className="px-3.5 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1.5 cursor-pointer"
+              title="Listen to Mystery"
+            >
+              🔊 Listen Mystery
+            </button>
+          </div>
 
           <h2 className="wonder-puzzle-question-text">
             {wonderData.puzzleCard.questionText}

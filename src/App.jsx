@@ -74,10 +74,10 @@ export default function App() {
     }
   }, []);
 
-  // STOP NARRATION IMMEDIATELY WHEN PHASE OR INTRO SCREEN CHANGES
+  // STOP NARRATION IMMEDIATELY ONLY WHEN PHASE CHANGES
   useEffect(() => {
     stopNarration();
-  }, [currentPhase, isIntroScreen]);
+  }, [currentPhase]);
 
   const markPhaseComplete = (phaseId) => {
     setProgress(prev => ({

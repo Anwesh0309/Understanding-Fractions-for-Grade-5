@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { storyCards } from '../../data/storyContent';
 import { MascotBubble } from '../shell/MascotBubble';
-import { speakText, stopNarration } from '../../utils/audio';
+import { speakText, stopNarration, unlockAudio } from '../../utils/audio';
 import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 
 export function StoryPhase({ onComplete }) {
@@ -65,7 +65,19 @@ export function StoryPhase({ onComplete }) {
 
           {/* Right Side: Narrative Content */}
           <div className="story-content-side-box">
-            <h2 className="story-card-title-gold">{card.title}</h2>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h2 className="story-card-title-gold">{card.title}</h2>
+              <button
+                onClick={() => {
+                  unlockAudio();
+                  speakText(card.narration, { audioUrl: `/audio/story/story_card_${currentIdx + 1}.mp3` });
+                }}
+                className="px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+                title="Listen to Story Card"
+              >
+                🔊 Listen
+              </button>
+            </div>
 
             <p className="story-narrative-paragraph">{card.text}</p>
 
