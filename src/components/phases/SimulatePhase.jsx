@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { simulateStations, spotTheSlipProblems } from '../../data/simulateContent';
 import { MascotBubble } from '../shell/MascotBubble';
-import { speakText, stopNarration, unlockAudio } from '../../utils/audio';
+import { speakText, stopNarration } from '../../utils/audio';
 import { addFractions } from '../../utils/fractionMath';
 import { ArrowLeft, ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
 
@@ -68,22 +68,9 @@ export function SimulatePhase({ onComplete }) {
 
         {/* Station Subtitle & Mascot */}
         <div className="simulate-header-box">
-          <div className="simulate-title-row flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <h2 className="simulate-station-title">{currentStation.title}</h2>
-              <span className="simulate-subtitle-pill">{currentStation.subtitle}</span>
-            </div>
-            <button
-              onClick={() => {
-                unlockAudio();
-                const audioUrl = stationAudioMap[currentStation.id];
-                speakText(`${currentStation.title}. ${currentStation.subtitle}`, { audioUrl });
-              }}
-              className="px-3.5 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1.5 cursor-pointer flex-shrink-0"
-              title="Listen to Station Guidance"
-            >
-              🔊 Listen Guidance
-            </button>
+          <div className="simulate-title-row">
+            <h2 className="simulate-station-title">{currentStation.title}</h2>
+            <span className="simulate-subtitle-pill">{currentStation.subtitle}</span>
           </div>
           <MascotBubble text={currentStation.mascotText} />
         </div>
