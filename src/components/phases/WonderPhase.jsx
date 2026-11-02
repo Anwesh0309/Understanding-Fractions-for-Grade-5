@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { wonderData } from '../../data/wonderContent';
-import { speakText } from '../../utils/audio';
+import { speakText, stopNarration } from '../../utils/audio';
 import { Sparkles, ArrowRight, Lightbulb } from 'lucide-react';
 
 export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
@@ -8,10 +8,17 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
   const [showTeaser, setShowTeaser] = useState(false);
 
   useEffect(() => {
+    return () => {
+      stopNarration();
+    };
+  }, []);
+
+  useEffect(() => {
     setShowPuzzle(!isIntroScreen);
   }, [isIntroScreen]);
 
   useEffect(() => {
+    stopNarration();
     if (showPuzzle) {
       speakText(wonderData.puzzleCard.narration);
     } else {
@@ -20,8 +27,8 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
   }, [showPuzzle]);
 
   const handleBeginJourney = () => {
+    stopNarration();
     setShowPuzzle(true);
-    speakText(wonderData.puzzleCard.narration);
     if (setIsIntroScreen) {
       setIsIntroScreen(false);
     }
@@ -215,7 +222,10 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
 
         {/* Primary Discover Button below card */}
         <button
-          onClick={onComplete}
+          onClick={() => {
+            stopNarration();
+            onComplete();
+          }}
           className="btn-discover-purple-ss"
         >
           ✨ Let's Investigate! ✨

@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { simulateStations, spotTheSlipProblems } from '../../data/simulateContent';
 import { MascotBubble } from '../shell/MascotBubble';
-import { speakText } from '../../utils/audio';
+import { speakText, stopNarration } from '../../utils/audio';
 import { addFractions } from '../../utils/fractionMath';
 import { ArrowLeft, ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
+
+const stationAudioMap = {
+  "slice-it": "/audio/simulation/sim_slice_it.mp3",
+  "match-it": "/audio/simulation/sim_match_it.mp3",
+  "fraction-slider": "/audio/simulation/sim_fraction_slider.mp3",
+  "spot-the-slip": "/audio/simulation/sim_spot_the_slip.mp3",
+};
 
 export function SimulatePhase({ onComplete }) {
   const [activeTab, setActiveTab] = useState("slice-it");
@@ -12,8 +19,16 @@ export function SimulatePhase({ onComplete }) {
   const currentStation = simulateStations.find(s => s.id === activeTab) || simulateStations[0];
 
   useEffect(() => {
+    return () => {
+      stopNarration();
+    };
+  }, []);
+
+  useEffect(() => {
+    stopNarration();
     if (currentStation) {
-      speakText(`${currentStation.title}. ${currentStation.subtitle}`);
+      const audioUrl = stationAudioMap[currentStation.id];
+      speakText(`${currentStation.title}. ${currentStation.subtitle}`, { audioUrl });
     }
   }, [activeTab]);
 
@@ -39,7 +54,10 @@ export function SimulatePhase({ onComplete }) {
           {simulateStations.map((st) => (
             <button
               key={st.id}
-              onClick={() => setActiveTab(st.id)}
+              onClick={() => {
+                stopNarration();
+                setActiveTab(st.id);
+              }}
               className={`simulate-tab-btn ${activeTab === st.id ? 'active' : ''}`}
             >
               <span className="tab-icon">{st.icon}</span>
@@ -70,6 +88,7 @@ export function SimulatePhase({ onComplete }) {
           <div className="simulate-nav-left">
             <button
               onClick={() => {
+                stopNarration();
                 const idx = simulateStations.findIndex(s => s.id === activeTab);
                 if (idx > 0) setActiveTab(simulateStations[idx - 1].id);
               }}
@@ -84,6 +103,7 @@ export function SimulatePhase({ onComplete }) {
             {activeTab !== simulateStations[simulateStations.length - 1].id ? (
               <button
                 onClick={() => {
+                  stopNarration();
                   const idx = simulateStations.findIndex(s => s.id === activeTab);
                   if (idx < simulateStations.length - 1) setActiveTab(simulateStations[idx + 1].id);
                 }}
@@ -93,7 +113,10 @@ export function SimulatePhase({ onComplete }) {
               </button>
             ) : (
               <button
-                onClick={onComplete}
+                onClick={() => {
+                  stopNarration();
+                  onComplete();
+                }}
                 className="btn-sim-complete-gold"
               >
                 Continue to Practice Phase 🎮 <ArrowRight className="w-4 h-4 ml-1" />

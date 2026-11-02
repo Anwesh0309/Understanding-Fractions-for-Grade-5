@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { storyCards } from '../../data/storyContent';
 import { MascotBubble } from '../shell/MascotBubble';
-import { speakText } from '../../utils/audio';
+import { speakText, stopNarration } from '../../utils/audio';
 import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 
 export function StoryPhase({ onComplete }) {
@@ -10,26 +10,31 @@ export function StoryPhase({ onComplete }) {
   const card = storyCards[currentIdx];
 
   useEffect(() => {
+    return () => {
+      stopNarration();
+    };
+  }, []);
+
+  useEffect(() => {
+    stopNarration();
     if (card && card.narration) {
       speakText(card.narration);
     }
   }, [currentIdx]);
 
   const handleNext = () => {
+    stopNarration();
     if (currentIdx < storyCards.length - 1) {
-      const nextIdx = currentIdx + 1;
-      setCurrentIdx(nextIdx);
-      speakText(storyCards[nextIdx].narration);
+      setCurrentIdx(currentIdx + 1);
     } else {
       onComplete();
     }
   };
 
   const handleBack = () => {
+    stopNarration();
     if (currentIdx > 0) {
-      const nextIdx = currentIdx - 1;
-      setCurrentIdx(nextIdx);
-      speakText(storyCards[nextIdx].narration);
+      setCurrentIdx(currentIdx - 1);
     }
   };
 

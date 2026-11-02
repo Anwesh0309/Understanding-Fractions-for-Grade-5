@@ -189,6 +189,12 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   const [outOfHeartsModal, setOutOfHeartsModal] = useState(false);
 
   useEffect(() => {
+    return () => {
+      stopNarration();
+    };
+  }, []);
+
+  useEffect(() => {
     const qList = getRoundQuestions(world.id, 10);
     setQuestions(qList);
     setQIdx(0);
@@ -205,12 +211,14 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
     stemText: 'If 3 × 8 = 24, then 24 ÷ 3 = _____',
     correctAnswer: '8',
     options: ['8', '7', '6', '10'],
-    narrationText: 'If 3 × 8 = 24, then 24 ÷ 3 = _____'
+    narrationText: 'If 3 × 8 = 24, then 24 ÷ 3 = _____',
+    audioUrl: '/audio/questions/q_F1_01.mp3'
   };
 
   useEffect(() => {
     if (currentQ && !outOfHeartsModal) {
-      speakText(currentQ.narrationText || currentQ.stemText);
+      stopNarration();
+      speakText(currentQ.narrationText || currentQ.stemText, { audioUrl: currentQ.audioUrl });
       setSelectedOption(null);
       setIsAnswered(false);
       setShowHint(false);
@@ -230,6 +238,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
 
   const handleSelectAnswer = (option) => {
     if (isAnswered || outOfHeartsModal) return;
+    stopNarration();
     setSelectedOption(option);
     setIsAnswered(true);
 
@@ -297,6 +306,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   };
 
   const handleRetryWorld = () => {
+    stopNarration();
     const qList = getRoundQuestions(world.id, 10);
     setQuestions(qList);
     setQIdx(0);
@@ -308,6 +318,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
   };
 
   const getHintText = () => {
+    if (currentQ.hint) return currentQ.hint;
     if (currentQ.explanation) return currentQ.explanation;
     const text = currentQ.stemText || "";
     if (text.includes("simplest form")) return "💡 Hint: Divide both top and bottom numbers by their largest common divisor!";
@@ -413,7 +424,11 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
               onClick={() => {
                 const nextState = !showHint;
                 setShowHint(nextState);
-                if (nextState) speakText(getHintText());
+                if (nextState) {
+                  speakText(getHintText(), { audioUrl: currentQ.hintAudioUrl });
+                } else {
+                  stopNarration();
+                }
               }}
               className="btn-hint-gold-pill"
             >

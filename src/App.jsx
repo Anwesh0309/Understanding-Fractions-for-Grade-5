@@ -149,6 +149,7 @@ export default function App() {
           <div className="header-left-slot">
             <button
               onClick={() => {
+                stopNarration();
                 setProgress(getFreshDefaultProgress());
                 setCurrentPhase("wonder");
                 setIsIntroScreen(true);
@@ -163,6 +164,7 @@ export default function App() {
             currentPhase={currentPhase}
             completedPhases={progress.completedPhases}
             onPhaseSelect={(phaseId) => {
+              stopNarration();
               setCurrentPhase(phaseId);
               setIsIntroScreen(false);
             }}

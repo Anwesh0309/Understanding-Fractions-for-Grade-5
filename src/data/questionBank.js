@@ -1,4 +1,5 @@
-import { simplify, addFractions, subtractFractions, multiplyFractionByWhole, divideWholeByFraction, divideFractionByWhole, toMixedNumber, toImproperFraction } from '../utils/fractionMath';
+import { simplify, addFractions, subtractFractions, multiplyFractionByWhole, divideWholeByFraction, divideFractionByWhole, toMixedNumber, toImproperFraction } from '../utils/fractionMath.js';
+import { questionsData, getQuestionsForWorld } from './questionData.js';
 
 /**
  * Question Bank — 100 Question Templates across 10 Worlds (F1 to F10)
@@ -1376,81 +1377,19 @@ function getUniqueFallbackQuestion(worldId, qNum) {
 
 export function getRoundQuestions(worldId, count = 10) {
   try {
-    let worldTemplates = rawQuestionBank.filter(q => q && q.worldId === worldId);
-    if (!worldTemplates || worldTemplates.length === 0) {
-      worldTemplates = rawQuestionBank;
+    const list = getQuestionsForWorld(worldId);
+    if (list && list.length > 0) {
+      return list.slice(0, count).map(q => ({
+        ...q,
+        narrationText: q.stemText
+      }));
     }
-
-    const resultQuestions = [];
-    const seenStems = new Set();
-    const baseTimestamp = Date.now();
-
-    let attempts = 0;
-    while (resultQuestions.length < count && attempts < 150) {
-      attempts++;
-      const templateIdx = (resultQuestions.length + attempts) % worldTemplates.length;
-      const template = worldTemplates[templateIdx];
-
-      const seed = baseTimestamp + resultQuestions.length * 997 + attempts * 137;
-      let generated;
-      try {
-        generated = template.generate ? template.generate(seed) : template;
-      } catch (e) {
-        generated = null;
-      }
-
-      if (!generated || !generated.stemText) continue;
-
-      let stemText = generated.stemText;
-      let correctAnswer = String(generated.correctAnswer || "");
-      let distractors = (generated.distractors || []).map(String);
-
-      // If duplicate stem text, perturb with altSeed
-      if (seenStems.has(stemText) && template.generate) {
-        const altSeed = seed + attempts * 53;
-        try {
-          generated = template.generate(altSeed);
-          stemText = generated.stemText;
-          correctAnswer = String(generated.correctAnswer);
-          distractors = (generated.distractors || []).map(String);
-        } catch(e) {}
-      }
-
-      if (!seenStems.has(stemText)) {
-        seenStems.add(stemText);
-        const options = buildFourOptions(correctAnswer, distractors, seed + 99);
-
-        resultQuestions.push({
-          id: `${template.id || 'q'}-${resultQuestions.length + 1}`,
-          worldId: template.worldId || worldId,
-          subtopic: template.subtopic || "F1",
-          conceptTitle: template.conceptTitle || "FRACTION PRACTICE",
-          stemText,
-          correctAnswer,
-          options,
-          narrationText: generated.narrationText || stemText
-        });
-      }
-    }
-
-    // If still under count, fill with guaranteed unique world questions
-    while (resultQuestions.length < count) {
-      const qNum = resultQuestions.length + 1;
-      const fallbackQ = getUniqueFallbackQuestion(worldId, qNum);
-      if (!seenStems.has(fallbackQ.stemText)) {
-        seenStems.add(fallbackQ.stemText);
-        resultQuestions.push(fallbackQ);
-      } else {
-        fallbackQ.stemText = `Challenge Question ${qNum}: Express ${qNum * 2}/${qNum * 3} in simplest form.`;
-        fallbackQ.correctAnswer = "2/3";
-        fallbackQ.options = buildFourOptions("2/3", ["3/4", "1/2", "4/5"], qNum * 17);
-        resultQuestions.push(fallbackQ);
-      }
-    }
-
-    return resultQuestions;
+    return questionsData.slice(0, count).map(q => ({
+      ...q,
+      narrationText: q.stemText
+    }));
   } catch (err) {
     console.error("getRoundQuestions error:", err);
-    return Array.from({ length: count }).map((_, i) => getUniqueFallbackQuestion(worldId, i + 1));
+    return rawQuestionBank.slice(0, count);
   }
 }

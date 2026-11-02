@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { MascotBubble } from '../shell/MascotBubble';
-import { speakText } from '../../utils/audio';
+import { speakText, stopNarration } from '../../utils/audio';
 import { Trophy, Star, Award, RotateCcw, Home, Printer, Sparkles, Download } from 'lucide-react';
 
 export function ReflectPhase({ progress, onRestart, onGoHome }) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [studentName, setStudentName] = useState("Oliver");
+
+  useEffect(() => {
+    return () => {
+      stopNarration();
+    };
+  }, []);
 
   useEffect(() => {
     // Trigger confetti
@@ -19,6 +25,7 @@ export function ReflectPhase({ progress, onRestart, onGoHome }) {
     } catch (e) {
       console.warn("Confetti error:", e);
     }
+    stopNarration();
     speakText("Journey Complete! You have mastered Grade 5 Fractions! View your overall scoreboard and certificate!");
   }, []);
 
