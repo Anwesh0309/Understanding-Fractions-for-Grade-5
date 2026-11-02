@@ -62,7 +62,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
             <div className="fox-avatar-circle-ss">
               <span className="fox-emoji-ss">🦊</span>
             </div>
-            <div className="speech-bubble-box-ss flex items-center justify-between gap-3">
+            <div className="speech-bubble-box-ss">
               <p className="speech-text-ss">
                 Hi! I'm Figgy. Ready to slice into fractions? 🍕
               </p>
@@ -71,7 +71,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
                   unlockAudio();
                   speakText("Hi! I'm Figgy. Ready to slice into fractions? Learn to split numbers into equal parts, connect fractions to division, and master equivalent fractions!", { audioUrl: "/audio/wonder/wonder_mascot.mp3" });
                 }}
-                className="px-3 py-1 bg-amber-400 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+                className="btn-listen-pill"
                 title="Listen to Figgy"
               >
                 🔊 Listen
@@ -190,14 +190,14 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
           <div className="fox-avatar-circle-ss">
             <span className="fox-emoji-ss">🦊</span>
           </div>
-          <div className="speech-bubble-box-ss flex items-center justify-between gap-3">
+          <div className="speech-bubble-box-ss">
             <p className="speech-text-ss">{wonderData.puzzleCard.mascotComment || "Hmm... I wonder... 🤔"}</p>
             <button
               onClick={() => {
                 unlockAudio();
                 speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
               }}
-              className="px-3 py-1 bg-amber-400 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+              className="btn-listen-pill"
               title="Listen to Puzzle"
             >
               🔊 Listen
@@ -214,7 +214,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
                 unlockAudio();
                 speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
               }}
-              className="px-3.5 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1.5 cursor-pointer"
+              className="btn-listen-pill"
               title="Listen to Mystery"
             >
               🔊 Listen Mystery

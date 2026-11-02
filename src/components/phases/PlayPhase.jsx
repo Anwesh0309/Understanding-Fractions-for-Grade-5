@@ -344,15 +344,11 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
         <div className="play-stats-bar-ss">
           <div className="stats-pill-row-ss">
             {/* 3 Bright Red Hearts Indicator */}
-            <div className="stat-pill-ss hearts-pill flex gap-1.5 items-center px-3.5 py-1 bg-red-950/60 border border-red-500/40 rounded-full shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+            <div className="stat-pill-ss hearts-pill">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Heart
                   key={i}
-                  className={`w-5 h-5 transition-all duration-300 ${
-                    i < lives
-                      ? 'text-red-500 fill-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.9)] scale-110'
-                      : 'text-slate-700 fill-slate-800 opacity-30 scale-90'
-                  }`}
+                  className={`heart-icon ${i < lives ? 'heart-alive' : 'heart-empty'}`}
                 />
               ))}
             </div>

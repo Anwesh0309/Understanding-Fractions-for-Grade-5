@@ -72,7 +72,7 @@ export function StoryPhase({ onComplete }) {
                   unlockAudio();
                   speakText(card.narration, { audioUrl: `/audio/story/story_card_${currentIdx + 1}.mp3` });
                 }}
-                className="px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
+                className="btn-listen-pill"
                 title="Listen to Story Card"
               >
                 🔊 Listen

@@ -946,3 +946,4 @@ if (!css.includes('@keyframes floatGentle')) {
 
 fs.writeFileSync(cssPath, css);
 console.log('App.css successfully updated and polished!');
+
