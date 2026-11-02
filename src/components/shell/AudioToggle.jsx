@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import { toggleMute, getMuteState } from '../../utils/audio';
+import { toggleMute, getMuteState, unlockAudio } from '../../utils/audio';
 
 export function AudioToggle() {
   const [muted, setMuted] = useState(getMuteState());
 
   const handleToggle = () => {
+    unlockAudio();
     const newState = toggleMute();
     setMuted(newState);
   };

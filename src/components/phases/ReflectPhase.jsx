@@ -26,7 +26,7 @@ export function ReflectPhase({ progress, onRestart, onGoHome }) {
       console.warn("Confetti error:", e);
     }
     stopNarration();
-    speakText("Journey Complete! You have mastered Grade 5 Fractions! View your overall scoreboard and certificate!");
+    speakText("Journey Complete! You have mastered Grade 5 Fractions! View your overall scoreboard and certificate!", { audioUrl: "/audio/reflect/reflect_complete.mp3" });
   }, []);
 
   // Calculate aggregate stats

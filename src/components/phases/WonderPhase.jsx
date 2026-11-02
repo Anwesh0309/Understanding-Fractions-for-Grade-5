@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { wonderData } from '../../data/wonderContent';
-import { speakText, stopNarration } from '../../utils/audio';
+import { speakText, stopNarration, unlockAudio } from '../../utils/audio';
 import { Sparkles, ArrowRight, Lightbulb } from 'lucide-react';
 
 export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
@@ -20,13 +20,14 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
   useEffect(() => {
     stopNarration();
     if (showPuzzle) {
-      speakText(wonderData.puzzleCard.narration);
+      speakText(wonderData.puzzleCard.narration, { audioUrl: "/audio/wonder/wonder_puzzle.mp3" });
     } else {
-      speakText("Welcome to Grade 5 Fractions Adventure! Ready to slice into fractions with Figgy?");
+      speakText("Welcome to Grade 5 Fractions Adventure! Ready to slice into fractions with Figgy?", { audioUrl: "/audio/wonder/wonder_intro.mp3" });
     }
   }, [showPuzzle]);
 
   const handleBeginJourney = () => {
+    unlockAudio();
     stopNarration();
     setShowPuzzle(true);
     if (setIsIntroScreen) {
@@ -68,7 +69,7 @@ export function WonderPhase({ isIntroScreen, setIsIntroScreen, onComplete }) {
                 Hi! I'm Figgy. Ready to slice into fractions? 🍕
               </p>
               <button
-                onClick={() => speakText("Hi! I'm Figgy. Ready to slice into fractions? Learn to split numbers into equal parts, connect fractions to division, and master equivalent fractions!")}
+                onClick={() => speakText("Hi! I'm Figgy. Ready to slice into fractions? Learn to split numbers into equal parts, connect fractions to division, and master equivalent fractions!", { audioUrl: "/audio/wonder/wonder_mascot.mp3" })}
                 className="px-3 py-1 bg-amber-400 text-slate-950 font-extrabold rounded-full text-xs shadow hover:scale-105 transition-transform flex items-center gap-1 cursor-pointer"
                 title="Listen to Narration"
               >

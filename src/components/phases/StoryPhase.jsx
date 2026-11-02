@@ -18,7 +18,7 @@ export function StoryPhase({ onComplete }) {
   useEffect(() => {
     stopNarration();
     if (card && card.narration) {
-      speakText(card.narration);
+      speakText(card.narration, { audioUrl: `/audio/story/story_card_${currentIdx + 1}.mp3` });
     }
   }, [currentIdx]);
 

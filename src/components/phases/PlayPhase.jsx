@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { worldsData } from '../../data/worlds';
 import { getRoundQuestions } from '../../data/questionBank';
-import { speakText, stopNarration } from '../../utils/audio';
+import { speakText, stopNarration, unlockAudio } from '../../utils/audio';
 import { Flame, Star, Lock, Sparkles, RefreshCw, ArrowRight, Heart, Lightbulb, ArrowLeft } from 'lucide-react';
 
 export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
@@ -10,6 +10,8 @@ export function PlayPhase({ progress, onUpdateProgress, onComplete }) {
 
   const handleLaunchWorld = (e, worldId) => {
     if (e && e.stopPropagation) e.stopPropagation();
+    unlockAudio();
+    stopNarration();
     setSelectedWorldId(worldId);
     setInRound(true);
   };
@@ -254,7 +256,7 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
         type: 'correct',
         message: `Correct! ${currentQ.explanation || 'Great job!'}`
       });
-      speakText("Correct!");
+      speakText("Correct! Great job!", { audioUrl: "/audio/feedback/correct.mp3" });
     } else {
       const newLives = lives - 1;
       setLives(newLives);
@@ -266,13 +268,13 @@ function PlayRoundView({ worldId, progress, onUpdateProgress, onLaunchNextWorld,
           type: 'wrong',
           message: `The correct answer is ${currentQ.correctAnswer}`
         });
-        speakText("Out of hearts! Don't worry, practice makes perfect!");
+        speakText("Out of hearts! Don't worry, practice makes perfect! Let's try again!", { audioUrl: "/audio/feedback/out_of_hearts.mp3" });
       } else {
         setFeedbackPopup({
           type: 'wrong',
           message: `The correct answer is ${currentQ.correctAnswer}`
         });
-        speakText(`Not quite! The correct answer is ${currentQ.correctAnswer}`);
+        speakText("Not quite! Look at the hint or try again!", { audioUrl: "/audio/feedback/wrong.mp3" });
       }
     }
   };
